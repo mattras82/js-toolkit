@@ -1,0 +1,175 @@
+@import "~scss-settings/toolkit";
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+$lightbox-container-bg: if(variable-exists("white"), $white, #ffffff) !default;
+$lightbox-loading-color: if(function-exists(get-color), get-color(primary), #349bd7) !default;
+$lightbox-loading-size: 120px !default;
+$lightbox-loading-thickness: 16px !default;
+
+.lightbox {
+	cursor: pointer;
+
+	&-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		background-color: #333333;
+		opacity: 0;
+		transition: opacity 0.25s ease-out;
+		z-index: -5;
+	}
+
+	&-container {
+		position: fixed;
+		top: calc(50% - 1rem);
+		left: calc(50% - 1rem);
+		max-height: calc(100vh - 2rem);
+		max-width: calc(100vw - 2rem);
+		width: 100%;
+		transform: translate(-50%, -50%);
+		margin: 1rem;
+		padding: 1rem;
+		background: $lightbox-container-bg;
+		opacity: 0;
+		transition: none;
+		z-index: -5;
+		overflow: auto;
+
+		> .lightbox-close {
+			float: right;
+			clear: both;
+			cursor: pointer;
+
+			& + * {
+				clear: both;
+			}
+		}
+
+		@if (mixin-exists(breakpoint) and variable-exists(breakpoints)) {
+			@include breakpoint(large) {
+				max-width: calc(#{map_get($breakpoints, large)} - 2rem);
+			}
+
+			@include breakpoint(xlarge) {
+				max-width: calc(#{map_get($breakpoints, large)} + 8rem);
+			}
+		} @else {
+			@media all and (min-width: 1024px) {
+				max-width: calc(1024px - 2rem);
+			}
+			@media all and (min-width: 1200px) {
+				max-width: calc(1024px + 8rem);
+			}
+		}
+
+		&.lightbox {
+			&-iframe,
+			&-image,
+			&-video {
+				background: transparent;
+				height: calc(100vh - 2rem);
+				padding: 0;
+				overflow: initial;
+
+				.lightbox-close {
+					color: #ffffff;
+				}
+
+				iframe {
+					width: 100%;
+					height: calc(100% - 2.5rem);
+					margin-top: 0.5rem;
+				}
+
+				&.loading {
+					background: rgba(250, 250, 250, 0.9);
+					width: 100%;
+					height: 100%;
+
+					&:before {
+						content: " ";
+						position: absolute;
+						top: calc(50% - #{($lightbox-loading-size + $lightbox-loading-thickness) / 2});
+						left: calc(50% - #{($lightbox-loading-size + $lightbox-loading-thickness) / 2});
+						border: $lightbox-loading-thickness solid #f3f3f3;
+						border-top: $lightbox-loading-thickness solid $lightbox-loading-color;
+						border-radius: 50%;
+						width: $lightbox-loading-size;
+						height: $lightbox-loading-size;
+						animation: spin 2s linear infinite;
+					}
+				}
+
+				video,
+				img {
+					width: auto;
+					display: block;
+					max-height: calc(100% - 2rem);
+					margin: 0 auto;
+					max-width: calc(100% - 2rem);
+					position: absolute;
+					top: calc(50% + 1rem);
+					left: 50%;
+					transform: translate(-50%, -50%);
+				}
+			}
+		}
+
+		&.lightbox-vid-ratio {
+			height: auto;
+
+			&:after {
+				content: "";
+				display: block;
+				margin-top: 56.25%;
+			}
+
+			> .lightbox-close {
+				display: none;
+			}
+
+			iframe,
+			video {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+			}
+		}
+	}
+
+	&-open {
+		overflow: hidden;
+		max-height: 100vh;
+		max-width: 100vw;
+
+		.lightbox {
+			&-overlay {
+				opacity: 0.95;
+				z-index: 999998;
+			}
+
+			&-container {
+				opacity: 1;
+				z-index: 1999998;
+			}
+		}
+	}
+}
+
+html {
+	width: auto !important;
+	height: auto !important;
+	overflow: visible !important;
+}

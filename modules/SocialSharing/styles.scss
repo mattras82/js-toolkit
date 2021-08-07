@@ -1,0 +1,29 @@
+@import "~scss-settings/toolkit";
+
+$social-share-bg: if(function-exists(get-color), get-color(primary), #349bd7) !default;
+$social-share-color: if(variable-exists('white'), $white, #ffffff) !default;
+$social-share-size: 2.25rem !default;
+$social-share-margin: 1rem 0.25rem !default;
+$social-share-hover-bg: scale_color($social-share-bg, $lightness: -14%) !default;
+
+.social-sharing-link {
+	display: inline-block;
+	color: $social-share-color;
+	background: $social-share-bg;
+	width: $social-share-size;
+	height: $social-share-size;
+	text-align: center;
+	line-height: $social-share-size;
+	cursor: pointer;
+	margin: $social-share-margin;
+	transition: all 300ms ease-out;
+
+	&:hover {
+		background-color: $social-share-hover-bg;
+		transform: scale(1.1);
+	}
+
+	&:first-of-type {
+		margin-left: 0;
+	}
+}

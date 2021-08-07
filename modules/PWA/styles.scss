@@ -1,0 +1,36 @@
+@import "~scss-settings/toolkit";
+
+$offline-container-bg: if(variable-exists('white'), $white, #ffffff) !default;
+
+#add2home {
+	position: fixed;
+	bottom: 0;
+	right: 0.5rem;
+	opacity: 0;
+	transform: translateY(100%);
+	transition: all 350ms ease-out;
+
+	&.active {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.offline-container {
+	display: flex;
+	flex-flow: column nowrap;
+	min-height: 100vh;
+	min-width: 100vw;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	background-color: $offline-container-bg;
+	z-index: 999999;
+	padding: 1rem 0.75rem;
+
+	p {
+		margin-top: 0.5rem;
+		font-size: 1.25rem;
+	}
+}

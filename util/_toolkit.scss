@@ -1,0 +1,22 @@
+@import "foundation";
+
+// LAZY MEDIA
+$lazy-background: #eaeaea;
+$lazy-min-width: 55px;
+$lazy-min-height: 55px;
+
+// LIGHTBOX
+$lightbox-container-bg: $white;
+$lightbox-loading-color: get-color(primary);
+$lightbox-loading-size: 120px;
+$lightbox-loading-thickness: 16px;
+
+// SOCIAL SHARING
+$social-share-bg: get-color(primary);
+$social-share-color: $white;
+$social-share-size: 2.25rem;
+$social-share-margin: 1rem 0.25rem;
+$social-share-hover-bg: scale_color($social-share-bg, $lightness: -14%);
+
+// PWA
+$offline-container-bg: $white;

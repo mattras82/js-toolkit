@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PF Toolkit Lazy Loading Test</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <style>
+        main {
+            min-height: 100vh;
+            background-color: #fafafa;
+            color: #111111;
+            display: flex;
+            flex-flow: row wrap;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        html, body {
+            font-size: 18px;
+            font-family: Roboto, 'Roboto', Arial, sans-serif;
+        }
+        .test-box {
+            padding: 0.5rem 1rem 105vh;
+            border: 1px solid #b4b4b4;
+            margin-bottom: 1.5rem;
+        }
+        .hide {
+            display: none;
+        }
+    </style>
+    <link href="dist/main.css" rel="stylesheet" />
+</head>
+<body>
+    <main>
+        <div class="container">
+            <h1>Smooth Scroll Tests</h1>
+            <p><a href="index.html">Back to main page</a></p>
+            <div class="test-box">
+                <a href="#down" class="smooth-scroll" id="up">Going down</a>
+            </div>
+            <div class="test-box">
+                <a href="#hidden" class="lightbox">Lightbox test</a>
+            </div>
+            <div class="test-box">
+                <a href="/lazy-media.html#video" class="smooth-scroll">Different page test</a>
+            </div>
+            <div class="test-box">
+                <a href="#up" class="smooth-scroll" id="down">Going up</a>
+            </div>
+        </div>
+        <div class="hide">
+            <div id="hidden">
+                <p>This is hidden content.</p>
+                <p><a href="#up" class="smooth-scroll lightbox-close">Take me to the top</a></p>
+                <p><a href="#down" class="smooth-scroll lightbox-close">Take me to the bottom</a></p>
+            </div>
+        </div>
+    </main>
+    <script>
+        function addTimestamp($el) {
+          let $p = document.createElement('p');
+          let d = new Date();
+          $p.innerHTML = `Loaded at: <em>${d.toLocaleTimeString()}</em>`;
+          $el.after($p);
+        }
+        document.querySelectorAll('img[data-src]').forEach($e => {
+          $e.addEventListener('load', () => {
+            if (!$e.src.startsWith('data')) {
+              addTimestamp($e);
+            }
+          });
+        });
+        document.querySelectorAll('video').forEach($v => {
+          $v.addEventListener('loadeddata', () => {
+            addTimestamp($v);
+          }, {once: true});
+        });
+    </script>
+    <script type="text/javascript" src="dist/main.js"></script>
+</body>
+</html>

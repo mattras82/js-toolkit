@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PF Toolkit Lazy Loading Test</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <style>
+        main {
+            min-height: 100vh;
+            background-color: #fafafa;
+            color: #111111;
+            display: flex;
+            flex-flow: row wrap;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        html, body {
+            font-size: 18px;
+            font-family: Roboto, 'Roboto', Arial, sans-serif;
+        }
+        .test-box {
+            padding: 0.5rem 1rem 105vh;
+            border: 1px solid #b4b4b4;
+            margin-bottom: 1.5rem;
+        }
+        .test-box img, .test-box picture, .test-box svg, .test-box video {
+            max-width: 100%;
+            height: auto;
+            display: inline-block;
+        }
+        .hide {
+            display: none;
+        }
+    </style>
+    <link href="dist/main.css" rel="stylesheet" />
+</head>
+<body>
+    <main>
+        <div class="container">
+            <h1>Lazy Loading Tests</h1>
+            <a href="index.html">Back to main page</a>
+            <div class="test-box">
+                <img data-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/logo.png" loading="lazy" alt="PublicFunction logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII=">
+            </div>
+            <div class="test-box">
+                <img data-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png" loading="lazy" alt="PublicFunction logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII=">
+            </div>
+            <div class="test-box">
+                <img data-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/logo.png" loading="lazy" alt="PublicFunction logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII=">
+            </div>
+            <div class="test-box">
+                <img data-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png" loading="lazy" alt="PublicFunction logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII=">
+            </div>
+            <div class="test-box">
+                <img data-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/logo.png" loading="lazy" alt="PublicFunction logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII=">
+            </div>
+            <div class="test-box" style="background-repeat: repeat" data-lazy-bg="url(https://publicfunction.site/wp-content/themes/pf-main/assets/images/logo.png)">
+                <p>This is a test of the lazy loaded background.</p>
+            </div>
+            <div class="test-box" id="video">
+                <p>Video test</p>
+                <video data-poster="https://publicfunction.site/wp-content/themes/pf-main/assets/images/logo.png" playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop">
+                    <source type="video/mp4" data-src="https://www.statecontractmfg.com/Images/Banner/state-contract-homepage-video_6d24acac-2f7a-4d76-82ca-a8c2e3c2c171.mp4">
+                </video>
+            </div>
+            <div class="test-box" id="svg">
+                <p>SVG test</p>
+                <img data-src="https://upload.wikimedia.org/wikipedia/commons/0/03/Hamiltonian_graph_example.svg" loading="lazy" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII=">
+            </div>
+            <div class="test-box" id="svg-replace">
+                <p>SVG Replace Test</p>
+                <img data-src="https://upload.wikimedia.org/wikipedia/commons/0/03/Hamiltonian_graph_example.svg" loading="lazy" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII=">
+            </div>
+            <div class="test-box" id="picture">
+                <p>Picture test</p>
+                <picture>
+                    <source data-srcset="https://publicfunction.site/wp-content/themes/pf-main/assets/images/logo.png" media="(min-width: 1200px)">
+                    <source data-srcset="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png" media="(min-width: 800px)">
+                    <source data-srcset="https://publicfunction.site/wp-content/themes/pf-main/assets/images/logo.png" media="(min-width: 450px)">
+                    <img data-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon-32.png" loading="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII=" alt="placeholder" style="max-width: 100px">
+                </picture>
+            </div>
+        </div>
+    </main>
+    <script>
+        function addTimestamp($el) {
+          let $p = document.createElement('p');
+          let d = new Date();
+          $p.innerHTML = `Loaded at: <em>${d.toLocaleTimeString()}</em>`;
+          $el.after($p);
+        }
+        document.querySelectorAll('img[data-src]').forEach($e => {
+          $e.addEventListener('load', () => {
+            if (!$e.src.startsWith('data')) {
+              addTimestamp($e);
+            }
+          });
+        });
+        document.querySelectorAll('video').forEach($v => {
+          $v.addEventListener('loadeddata', () => {
+            addTimestamp($v);
+          }, {once: true});
+        });
+    </script>
+    <script type="text/javascript" src="dist/main.js"></script>
+</body>
+</html>

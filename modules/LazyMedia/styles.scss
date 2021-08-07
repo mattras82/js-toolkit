@@ -1,0 +1,34 @@
+@import "~scss-settings/toolkit";
+
+/// Background color for non-loaded elements
+/// @type Color
+$lazy-background: #eaeaea !default;
+
+/// Minimum width for lazy media that don't have a width property
+/// @type Number
+$lazy-min-width: 55px !default;
+
+/// Minimum height for lazy media that don't have a height property
+/// @type Number
+$lazy-min-height: 55px !default;
+
+
+.queued,
+.loading,
+.loaded {
+	transition: opacity 200ms ease-in-out;
+}
+
+.queued,
+.loading {
+	background-color: $lazy-background;
+	opacity: 0.5;
+
+	&:not([width]) {
+		min-width: $lazy-min-width;
+	}
+
+	&:not([height]) {
+		min-height: $lazy-min-height;
+	}
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PF Toolkit Social Sharing Test</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <style>
+        main {
+            min-height: 100vh;
+            background-color: #fafafa;
+            color: #111111;
+            display: flex;
+            flex-flow: row wrap;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        html, body {
+            font-size: 18px;
+            font-family: Roboto, 'Roboto', Arial, sans-serif;
+        }
+        .test-box {
+            padding: 0.5rem 1rem 1.25rem;
+            border: 1px solid #b4b4b4;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+        .test-box img {
+            max-width: 150px;
+        }
+        .hide {
+            display: none;
+        }
+    </style>
+    <link href="dist/main.css" rel="stylesheet" />
+</head>
+<body>
+    <main>
+        <div class="container">
+            <h1>Social Sharing Tests</h1>
+            <p><a href="index.html">Back to main page</a></p>
+            <div class="test-box" data-social-links data-title="Post Title" data-url="https://publicfunction.site" data-desc="This is the post description" data-src="Site Name">
+                <a href="#" class="social-sharing-link" data-popup="facebook" title="Share to Facebook">
+                    Facebook
+                </a>
+                <a href="#" class="social-sharing-link" data-popup="twitter" title="Share to Twitter">
+                    Twitter
+                </a>
+                <a href="#" class="social-sharing-link" data-popup="linkedin" title="Share to LinkedIn">
+                    LinkedIn
+                </a>
+                <a href="#" class="social-sharing-link" data-popup="email" title="Share to Email">
+                    Email
+                </a>
+            </div>
+            <div class="test-box" data-social-links data-title="Post #2 Title" data-url="https://publicfunction.site" data-desc="This is the second post description" data-src="Site Name">
+                <a href="#" data-popup="facebook" title="Share to Facebook">
+                    Facebook
+                </a>
+                <a href="#" data-popup="twitter" title="Share to Twitter">
+                    Twitter
+                </a>
+                <a href="#" data-popup="linkedin" title="Share to LinkedIn">
+                    LinkedIn
+                </a>
+                <a href="#" data-popup="email" title="Share to Email">
+                    Email
+                </a>
+            </div>
+        </div>
+    </main>
+    <script type="text/javascript" src="dist/main.js"></script>
+</body>
+</html>

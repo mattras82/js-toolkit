@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PF Toolkit Lightbox Test</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link href="dist/main.css" rel="stylesheet" />
+    <style>
+        main {
+            min-height: 100vh;
+            background-color: #fafafa;
+            color: #111111;
+            display: flex;
+            flex-flow: row wrap;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        html, body {
+            font-size: 18px;
+            font-family: Roboto, 'Roboto', Arial, sans-serif;
+        }
+        .test-box {
+            padding: 0.5rem 1rem 1.25rem;
+            border: 1px solid #b4b4b4;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+        .test-box img {
+            max-width: 150px;
+        }
+        .custom-lightbox {
+            max-width: 650px;
+            background-color: #ccc;
+            color: #101020;
+            font-family: fantasy;
+        }
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="container">
+            <h1>Lightbox Tests</h1>
+            <p><a href="index.html">Back to main page</a></p>
+            <div class="test-box">
+                <a href="#hidden" class="lightbox">Hidden Test</a>
+            </div>
+            <div class="test-box">
+                <div class="lightbox">
+                    <span>Nested Test</span>
+                    <div class="hide">
+                        <div class="lightbox-content">
+                            <p>This is some nested content.</p>
+                            <p>Below is a lazy loaded image</p>
+                            <img data-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png" alt="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII=" style="max-width: 200px; height: auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="test-box">
+                <a href="#hidden" class="lightbox" data-lb-class="custom-lightbox">Custom Class Test</a>
+            </div>
+            <div class="test-box">
+                <p>Image test</p>
+                <img src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png" alt="Public Function logo" class="lightbox">
+            </div>
+            <div class="test-box">
+                <p>Secondary image test</p>
+                <img src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png" alt="Public Function logo" data-lb-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/logo.png" class="lightbox">
+            </div>
+            <div class="test-box">
+                <p>Data image test</p>
+                <a href="#" data-lb-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png">Click here for image</a>
+            </div>
+            <div class="test-box">
+                <p>Video test</p>
+                <a href="#" data-lb-iframe="https://www.youtube.com/embed/xyuMvwWZv2w" data-lb-class="lightbox-vid-ratio">Click here for video</a>
+            </div>
+            <div class="test-box">
+                <p>Iframe test</p>
+                <a href="#" data-lb-iframe="https://publicfunction.site">Click here for iframe</a>
+            </div>
+        </div>
+    </main>
+    <div class="hide">
+        <div id="hidden">
+            <p>This content is hidden by default.</p>
+        </div>
+    </div>
+    <script type="text/javascript" src="dist/main.js"></script>
+</body>
+</html>
