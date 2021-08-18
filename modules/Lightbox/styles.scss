@@ -48,6 +48,8 @@ $lightbox-loading-thickness: 16px !default;
 			float: right;
 			clear: both;
 			cursor: pointer;
+			background: none;
+			border: none;
 
 			& + * {
 				clear: both;
@@ -81,7 +83,7 @@ $lightbox-loading-thickness: 16px !default;
 				overflow: initial;
 
 				.lightbox-close {
-					color: #ffffff;
+					fill: #ffffff;
 				}
 
 				iframe {

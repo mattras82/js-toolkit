@@ -50,8 +50,10 @@ class Lightbox extends PFSingleton {
     this.$container = document.createElement('div');
     this.$container.classList.add('lightbox-container');
     this.$container.innerHTML = `<button class="lightbox-close" type="button" aria-label="Close popup">
-                                    <span class="fa fa-times fa-2x" aria-hidden="true"></span>
-                                    <span class="show-for-sr">Close</span>
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+                                    <path d="M11,14.143,3.143,22,0,18.853,7.855,11,0,3.148,3.142.007,11,7.859,18.856,0,22,3.143,14.14,11,22,18.859,18.857,22Z"/>
+                                  </svg>
+  
                                  </button>`;
     this.$body.append(this.$container);
   }
@@ -174,7 +176,7 @@ class Lightbox extends PFSingleton {
           if (!content.classList.contains('lightbox-loaded')) this.preLoadContent(content);
           this.$contentParent = content.parentNode;
           this.contentPosition = [...content.parentNode.children].indexOf(content);
-        } catch(e) {
+        } catch (e) {
           this.log(`Error in src: ${src}\n${e}`, 'warn');
         }
       }
@@ -211,7 +213,7 @@ class Lightbox extends PFSingleton {
     $frame.setAttribute('allowfullscreen', 'allowfullscreen');
     $frame.addEventListener('load', () => {
       this.$container.classList.remove('loading');
-    }, {once: true});
+    }, { once: true });
     this.tempClasses.push('loading');
     this.tempClasses.push('lightbox-iframe');
     return $frame;
@@ -222,7 +224,7 @@ class Lightbox extends PFSingleton {
     $image.src = src;
     $image.addEventListener('load', () => {
       this.$container.classList.remove('loading');
-    }, {once: true});
+    }, { once: true });
     this.tempClasses.push('loading');
     this.tempClasses.push('lightbox-image');
     return $image;
@@ -233,7 +235,7 @@ class Lightbox extends PFSingleton {
       let $el = this.getNode(anchor);
       if (!$el.classList.contains('lightbox-loaded')) this.preLoadContent($el);
       return this.stringToHTML($el.innerHTML);
-    } catch(e) {
+    } catch (e) {
       this.log(`Could not copy the anchor content\n${e}`, 'warn');
     }
     return null;
@@ -248,10 +250,10 @@ class Lightbox extends PFSingleton {
     $video.setAttribute('loop', 'loop');
     $video.addEventListener('loadeddata', () => {
       this.$container.classList.remove('loading');
-    }, {once: true});
+    }, { once: true });
     document.addEventListener('lightbox-opened', () => {
       $video.play();
-    }, {once: true});
+    }, { once: true });
     this.tempClasses.push('loading');
     this.tempClasses.push('lightbox-video');
     return $video;
@@ -286,7 +288,7 @@ class Lightbox extends PFSingleton {
       Lightbox.instance = this;
     }
   }
-  
+
   static getName() {
     return 'Lightbox';
   }
@@ -328,10 +330,10 @@ class Lightbox extends PFSingleton {
       });
     }
     if (typeof window.CustomEvent !== 'function') {
-      const CustomEvent =  ( event, params ) => {
+      const CustomEvent = (event, params) => {
         params = params || { bubbles: false, cancelable: false, detail: undefined };
-        let evt = document.createEvent( 'CustomEvent' );
-        evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+        let evt = document.createEvent('CustomEvent');
+        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
         return evt;
       };
 
