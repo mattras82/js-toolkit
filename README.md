@@ -140,7 +140,8 @@ You can manually trigger a Lightbox to open by calling the `click()` function on
 let $link = document.querySelector('#lightbox-link');
 if ($link) {
   $link.click();
-}```
+}
+```
 
 ### Nested Content Lightbox
 You can nest hidden content within a clickable lightbox element by adding either the "lightbox-content" class or the `data-lb-content` attribute to a child element.

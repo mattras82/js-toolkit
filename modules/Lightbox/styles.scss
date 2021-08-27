@@ -100,8 +100,8 @@ $lightbox-loading-thickness: 16px !default;
 					&:before {
 						content: " ";
 						position: absolute;
-						top: calc(50% - #{($lightbox-loading-size + $lightbox-loading-thickness) / 2});
-						left: calc(50% - #{($lightbox-loading-size + $lightbox-loading-thickness) / 2});
+						top: calc(50% - #{($lightbox-loading-size + $lightbox-loading-thickness) * .5});
+						left: calc(50% - #{($lightbox-loading-size + $lightbox-loading-thickness) * .5});
 						border: $lightbox-loading-thickness solid #f3f3f3;
 						border-top: $lightbox-loading-thickness solid $lightbox-loading-color;
 						border-radius: 50%;
