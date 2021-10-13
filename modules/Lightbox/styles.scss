@@ -9,6 +9,8 @@
 	}
 }
 $lightbox-container-bg: if(variable-exists("white"), $white, #ffffff) !default;
+$lightbox-container-margin: 1rem !default;
+$lightbox-container-padding: 1rem !default;
 $lightbox-loading-color: if(function-exists(get-color), get-color(primary), #349bd7) !default;
 $lightbox-loading-size: 120px !default;
 $lightbox-loading-thickness: 16px !default;
@@ -36,8 +38,8 @@ $lightbox-loading-thickness: 16px !default;
 		max-width: calc(100vw - 2rem);
 		width: 100%;
 		transform: translate(-50%, -50%);
-		margin: 1rem;
-		padding: 1rem;
+		margin: $lightbox-container-margin;
+		padding: $lightbox-container-padding;
 		background: $lightbox-container-bg;
 		opacity: 0;
 		transition: none;

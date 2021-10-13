@@ -7,6 +7,8 @@ $lazy-min-height: 55px;
 
 // LIGHTBOX
 $lightbox-container-bg: $white;
+$lightbox-container-margin: 1rem;
+$lightbox-container-padding: 1rem;
 $lightbox-loading-color: get-color(primary);
 $lightbox-loading-size: 120px;
 $lightbox-loading-thickness: 16px;

@@ -21,7 +21,9 @@ class Lightbox extends PFSingleton {
     }
     if (this === Lightbox.instance) {
       this.addElements();
+      this.beforeOpenEvent = new CustomEvent('lightbox-before-open');
       this.openedEvent = new CustomEvent('lightbox-opened');
+      this.beforeCloseEvent = new CustomEvent('lightbox-before-close');
       this.closedEvent = new CustomEvent('lightbox-closed');
       this.forcedOpenEvent = new CustomEvent('lightbox-forced-open');
       this.addListeners($links);
@@ -31,7 +33,7 @@ class Lightbox extends PFSingleton {
   addElements() {
     let bodySelector = 'body';
     if (this.isIOS()) {
-      bodySelector = '#form, .off-canvas-content, body > div';
+      bodySelector = '#form, .off-canvas-content, main, body > div';
     }
     this.$body = this.getNode(bodySelector);
     this.addOverlay();
@@ -76,7 +78,7 @@ class Lightbox extends PFSingleton {
 
   /**
    * Static function to attach a Lightbox click listener to the element that is passed.
-   * @param $el
+   * @param {HTMLElement} $el The element to attach the click listener to
    * @returns {boolean}
    * @constructor
    */
@@ -91,7 +93,32 @@ class Lightbox extends PFSingleton {
     return false;
   }
 
+  /**
+   * 
+   * @param {HTMLElement | String | Object} $el The element, HTML, or jQuery object to be placed into the Lightbox
+   * @param {Object | null} opts Options
+   * @returns {boolean}
+   * @constructor
+   */
+  static OpenContent($el, opts) {
+    if (!Lightbox.instance) {
+      Toolkit.add(Lightbox);
+    }
+    if (typeof $el === 'string') {
+      $el = Lightbox.instance.stringToHTML($el);
+    } else if (typeof jQuery === 'function' && $el instanceof jQuery) {
+      $el = $el[0];
+    }
+    if ($el instanceof HTMLElement) {
+      return Lightbox.instance.openFromElement($el, opts);
+    }
+    return false;
+  }
+
   open(content) {
+    if (this.beforeOpenEvent) {
+      if (!document.dispatchEvent(this.beforeOpenEvent)) return;
+    }
     if (this.$body.classList.contains('lightbox-transition')) {
       this.timeout().then(() => {
         this.open(content);
@@ -108,12 +135,20 @@ class Lightbox extends PFSingleton {
     this.getNodes('.lightbox-close', this.$container).forEach($e => {
       $e.addEventListener('click', this.close.bind(this));
     });
+    document.addEventListener('keyup', e => {
+      if (e.code === 'Escape') {
+        this.close();
+      }
+    }, { once: true });
   }
 
   close() {
     if (window.forceLightboxOpen) {
       if (this.forcedOpenEvent) document.dispatchEvent(this.forcedOpenEvent);
       return false;
+    }
+    if (this.beforeCloseEvent) {
+      if (!document.dispatchEvent(this.beforeCloseEvent)) return;
     }
     this.$body.classList.remove('lightbox-open');
     if (this.scrollPos > 0) {
@@ -147,6 +182,25 @@ class Lightbox extends PFSingleton {
     this.$contentParent = null;
     this.contentPosition = null;
     this.tempClasses = this.tempClasses.filter(c => this.$container.classList.remove(c) && false);
+  }
+
+  openFromElement($el, opts = {}) {
+    if (!($el instanceof Element)) return false;
+    if (!$el.classList.contains('lightbox-loaded')) this.preLoadContent($content);
+    
+    if (opts.class) {
+      if (typeof opts.class === 'string') opts.class = opts.class.split(' ');
+      this.tempClasses = this.tempClasses.concat(opts.class);
+    }
+    if (opts.copy) {
+      $el = this.stringToHTML($el.innerHTML);
+    } else {
+      this.$contentParent = $el.parentNode;
+      this.contentPosition = [...$el.parentNode.children].indexOf($el);
+    }
+
+    this.open($el);
+    return true;
   }
 
   handleClick(e, $a) {
@@ -345,4 +399,5 @@ class Lightbox extends PFSingleton {
 }
 
 export const Listen = Lightbox.Listen;
+export const Open = Lightbox.OpenContent;
 export { Lightbox };
