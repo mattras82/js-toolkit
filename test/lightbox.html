@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>PF Toolkit Lightbox Test</title>
@@ -14,35 +15,43 @@
             display: flex;
             flex-flow: row wrap;
         }
+
         .container {
             max-width: 1300px;
             margin: 0 auto;
             width: 100%;
         }
-        html, body {
+
+        html,
+        body {
             font-size: 18px;
             font-family: Roboto, 'Roboto', Arial, sans-serif;
         }
+
         .test-box {
             padding: 0.5rem 1rem 1.25rem;
             border: 1px solid #b4b4b4;
             margin-bottom: 1.5rem;
             display: inline-block;
         }
+
         .test-box img {
             max-width: 150px;
         }
+
         .custom-lightbox {
             max-width: 650px;
             background-color: #ccc;
             color: #101020;
             font-family: fantasy;
         }
+
         .hide {
             display: none;
         }
     </style>
 </head>
+
 <body>
     <main>
         <div class="container">
@@ -55,11 +64,16 @@
                 <div class="lightbox">
                     <span>Nested Test</span>
                     <div class="hide">
+                        <p>Before</p>
                         <div class="lightbox-content">
                             <p>This is some nested content.</p>
                             <p>Below is a lazy loaded image</p>
-                            <img data-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png" alt="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII=" style="max-width: 200px; height: auto">
+                            <img data-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png"
+                                alt="logo"
+                                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN89h8AAtEB5wrzxXEAAAAASUVORK5CYII="
+                                style="max-width: 200px; height: auto">
                         </div>
+                        <p>After</p>
                     </div>
                 </div>
             </div>
@@ -68,23 +82,48 @@
             </div>
             <div class="test-box">
                 <p>Image test</p>
-                <img src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png" alt="Public Function logo" class="lightbox">
+                <img src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png"
+                    alt="Public Function logo" class="lightbox">
             </div>
             <div class="test-box">
                 <p>Secondary image test</p>
-                <img src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png" alt="Public Function logo" data-lb-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/logo.png" class="lightbox">
+                <img src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png"
+                    alt="Public Function logo"
+                    data-lb-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/logo.png"
+                    class="lightbox">
             </div>
             <div class="test-box">
                 <p>Data image test</p>
-                <a href="#" data-lb-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png">Click here for image</a>
+                <a href="#"
+                    data-lb-src="https://publicfunction.site/wp-content/themes/pf-main/assets/images/icon.png">Click
+                    here for image</a>
             </div>
             <div class="test-box">
                 <p>Video test</p>
-                <a href="#" data-lb-iframe="https://www.youtube.com/embed/xyuMvwWZv2w" data-lb-class="lightbox-vid-ratio">Click here for video</a>
+                <a href="#" data-lb-iframe="https://www.youtube.com/embed/xyuMvwWZv2w"
+                    data-lb-class="lightbox-vid-ratio">Click here for video</a>
             </div>
             <div class="test-box">
                 <p>Iframe test</p>
                 <a href="#" data-lb-iframe="https://publicfunction.site">Click here for iframe</a>
+            </div>
+            <div class="test-box">
+                <p>Placement test</p>
+                <ol id="list" title="This is the element title">
+                    <li id="li-one">One</li>
+                    <li id="li-two">Two</li>
+                    <li id="li-three">Three</li>
+                    <li id="li-four">Four</li>
+                </ol>
+                <a href="#li-one" class="lightbox">One</a>
+                <a href="#li-two" class="lightbox">Two</a>
+                <a href="#li-three" class="lightbox">Three</a>
+                <a href="#li-four" class="lightbox">Four</a>
+            </div>
+            <div class="test-box">
+                <button type="button" id="manual1">Manual Setup #1</button>
+                <br>
+                <button type="button" id="manual2">Manual Setup #2</button>
             </div>
         </div>
     </main>
@@ -94,5 +133,67 @@
         </div>
     </div>
     <script type="text/javascript" src="dist/main.js"></script>
+    <script>
+        document.addEventListener('pf-toolkit-init', () => {
+            let $btn1 = document.querySelector('#manual1');
+            let $btn2 = document.querySelector('#manual2');
+            let $list = document.querySelector('#list');
+            let Lightbox = PF_Toolkit.get('Lightbox');
+            // document.addEventListener('lightbox-before-open', e => {
+            //     if (!confirm('Open lightbox with document listener?')) {
+            //         e.preventDefault();
+            //     }
+            // });
+            $list.addEventListener('lightbox-before-open', e => {
+                if (!confirm('Open lightbox with $list listener?')) {
+                    e.preventDefault();
+                }
+            });
+            $btn1.addEventListener('click', e => {
+                e.preventDefault();
+                Lightbox.openFromElement($list, {
+                    buttons: [
+                        {
+                            text: "OK",
+                            click: function () {
+                                alert('You clicked Ok!');
+                            },
+                            class: 'one two three'
+                        },
+                        {
+                            text: "Cancel",
+                            click: function () {
+                                alert('You clicked Cancel! Closing the lightbox now');
+                            },
+                            class: ['lightbox-close', 'cancel-btn']
+                        }
+                    ],
+                    open: () => console.log('Button 1 lightbox has been opened'),
+                    close: () => console.warn('Button 1 lightbox has been closed')
+                });
+            });
+
+            $btn2.addEventListener('click', e => {
+                e.preventDefault();
+                Lightbox.openFromElement($list, {
+                    title: 'This is the title',
+                    titleElement: 'h3',
+                    titleClass: 'title-class',
+                    buttons: {
+                        Submit: () => {
+                            alert('You clicked Submit!');
+                        },
+                        Cancel: () => {
+                            alert('You clicked Cancel! Closing the lightbox now.');
+                            Lightbox.close();
+                        }
+                    },
+                    closeOnEscape: false,
+                    close: () => console.warn('Button 2 Lightbox has been closed')
+                });
+            });
+        });
+    </script>
 </body>
+
 </html>

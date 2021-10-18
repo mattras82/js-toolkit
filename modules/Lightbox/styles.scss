@@ -11,6 +11,8 @@
 $lightbox-container-bg: if(variable-exists("white"), $white, #ffffff) !default;
 $lightbox-container-margin: 1rem !default;
 $lightbox-container-padding: 1rem !default;
+$lightbox-overlay-opacity: 0.95 !default;
+$lightbox-overlay-color: #333333 !default;
 $lightbox-loading-color: if(function-exists(get-color), get-color(primary), #349bd7) !default;
 $lightbox-loading-size: 120px !default;
 $lightbox-loading-thickness: 16px !default;
@@ -24,7 +26,7 @@ $lightbox-loading-thickness: 16px !default;
 		left: 0;
 		width: 100vw;
 		height: 100vh;
-		background-color: #333333;
+		background-color: $lightbox-overlay-color;
 		opacity: 0;
 		transition: opacity 0.25s ease-out;
 		z-index: -5;
@@ -95,7 +97,6 @@ $lightbox-loading-thickness: 16px !default;
 				}
 
 				&.loading {
-					background: rgba(250, 250, 250, 0.9);
 					width: 100%;
 					height: 100%;
 
@@ -160,7 +161,7 @@ $lightbox-loading-thickness: 16px !default;
 
 		.lightbox {
 			&-overlay {
-				opacity: 0.95;
+				opacity: $lightbox-overlay-opacity;
 				z-index: 999998;
 			}
 

@@ -9,9 +9,12 @@ class Lightbox extends PFSingleton {
     super('.lightbox, [data-lb-src], [data-lb-iframe], [data-lb-anchor]', 'Lightbox');
     this.defaultTimeout = 350;
     this.tempClasses = [];
+    this.beforeContent = [];
+    this.afterContent = [];
     this.videoExtensions = ['mp4', 'webm', 'ogg', 'avi'];
     this.scrollPos = 0;
     this.iOSTest = null;
+    this.closeOnEscape = true;
     return this.getInstance();
   }
 
@@ -21,11 +24,8 @@ class Lightbox extends PFSingleton {
     }
     if (this === Lightbox.instance) {
       this.addElements();
-      this.beforeOpenEvent = new CustomEvent('lightbox-before-open');
-      this.openedEvent = new CustomEvent('lightbox-opened');
-      this.beforeCloseEvent = new CustomEvent('lightbox-before-close');
-      this.closedEvent = new CustomEvent('lightbox-closed');
-      this.forcedOpenEvent = new CustomEvent('lightbox-forced-open');
+      // Test for CustomEvent browser support
+      this.customEvent = new CustomEvent('test');
       this.addListeners($links);
     }
   }
@@ -51,13 +51,16 @@ class Lightbox extends PFSingleton {
   addContainer() {
     this.$container = document.createElement('div');
     this.$container.classList.add('lightbox-container');
-    this.$container.innerHTML = `<button class="lightbox-close" type="button" aria-label="Close popup">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
-                                    <path d="M11,14.143,3.143,22,0,18.853,7.855,11,0,3.148,3.142.007,11,7.859,18.856,0,22,3.143,14.14,11,22,18.859,18.857,22Z"/>
-                                  </svg>
-  
-                                 </button>`;
     this.$body.append(this.$container);
+  }
+
+  getCloseButton() {
+    return this.stringToHTML(`<button class="lightbox-close lightbox-keep" type="button" aria-label="Close popup">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+                                <path d="M11,14.143,3.143,22,0,18.853,7.855,11,0,3.148,3.142.007,11,7.859,18.856,0,22,3.143,14.14,11,22,18.859,18.857,22Z"/>
+                                </svg>
+                              </button>`
+                            );
   }
 
   addListeners() {
@@ -74,6 +77,13 @@ class Lightbox extends PFSingleton {
       });
     });
     this.$elements.forEach($el => $el.addEventListener('click', e => { this.handleClick(e, $el); }));
+    this.keyupListenerRef = this.keyupListener.bind(this);
+  }
+
+  keyupListener(e) {
+    if (this.$body.classList.contains('lightbox-open') && e.code === 'Escape') {
+      this.close();
+    }
   }
 
   /**
@@ -115,10 +125,64 @@ class Lightbox extends PFSingleton {
     return false;
   }
 
-  open(content) {
-    if (this.beforeOpenEvent) {
-      if (!document.dispatchEvent(this.beforeOpenEvent)) return;
+  close() {
+    if (window.forceLightboxOpen) {
+      if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-forced-open', { bubbles: true }));
+      return false;
     }
+    if (this.customEvent) {
+      if (!this.$eventElement.dispatchEvent(new CustomEvent('lightbox-before-close', { cancelable: true, bubbles: true }))) return false;
+    }
+    this.$body.classList.remove('lightbox-open');
+    if (this.scrollPos > 0) {
+      window.scrollTo(0, this.scrollPos);
+      this.scrollPos = null;
+    }
+    document.removeEventListener('keyup', this.keyupListenerRef);
+    this.$body.classList.add('lightbox-transition');
+    this.timeout().then(this.clearLightbox.bind(this));
+  }
+
+  clearLightbox() {
+    this.clearContainer();
+    this.$body.classList.remove('lightbox-transition');
+    if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-closed', { bubbles: true }));
+    this.closeOnEscape = true;
+    this.$eventElement = null;
+  }
+
+  clearContainer() {
+    this.beforeContent = this.beforeContent.filter($el => $el.remove() && false);
+    this.afterContent = this.afterContent.filter($el => $el.remove() && false);
+
+    let removeList = [];
+    for (let $child of this.$container.children) {
+      if (!$child.classList.contains('lightbox-keep')) {
+        let remove = { el: $child, parent: this.$contentParent };
+        if (this.$contentParent && this.$contentParent.children.length > 0) {
+          remove.adjacent = this.$contentParent.children.length <= this.contentPosition ? null : this.$contentParent.children[this.contentPosition];
+        }
+        removeList.push(remove);
+      }
+    }
+    removeList.forEach(remove => {
+      if (remove.parent) {
+        if (remove.adjacent) {
+          remove.parent.insertBefore(remove.el, remove.adjacent);
+        } else {
+          remove.parent.append(remove.el);
+        }
+      } else {
+        remove.el.remove();
+      }
+    });
+
+    this.$contentParent = null;
+    this.contentPosition = null;
+    this.tempClasses = this.tempClasses.filter(c => this.$container.classList.remove(c) && false);
+  }
+
+  open(content) {
     if (this.$body.classList.contains('lightbox-transition')) {
       this.timeout().then(() => {
         this.open(content);
@@ -128,70 +192,122 @@ class Lightbox extends PFSingleton {
     if (this.isIOS()) {
       this.scrollPos = window.scrollY ? window.scrollY : window.pageYOffset;
     }
+    if (this.beforeContent.length) {
+      this.beforeContent.forEach($el => this.$container.append($el));
+    }
     this.$container.append(content);
+    if (this.afterContent.length) {
+      this.afterContent.forEach($el => this.$container.append($el));
+    }
     this.$body.classList.add('lightbox-open');
     this.tempClasses.forEach(c => this.$container.classList.add(c));
-    if (this.openedEvent) document.dispatchEvent(this.openedEvent);
+    if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-opened', { bubbles: true }));
     this.getNodes('.lightbox-close', this.$container).forEach($e => {
       $e.addEventListener('click', this.close.bind(this));
     });
-    document.addEventListener('keyup', e => {
-      if (e.code === 'Escape') {
-        this.close();
-      }
-    }, { once: true });
+    if (this.closeOnEscape) {
+      document.addEventListener('keyup', this.keyupListenerRef);
+    }
   }
 
-  close() {
-    if (window.forceLightboxOpen) {
-      if (this.forcedOpenEvent) document.dispatchEvent(this.forcedOpenEvent);
-      return false;
-    }
-    if (this.beforeCloseEvent) {
-      if (!document.dispatchEvent(this.beforeCloseEvent)) return;
-    }
-    this.$body.classList.remove('lightbox-open');
-    if (this.scrollPos > 0) {
-      window.scrollTo(0, this.scrollPos);
-      this.scrollPos = null;
-    }
-    this.$body.classList.add('lightbox-transition');
-    this.timeout().then(this.clearLightbox.bind(this));
-  }
-
-  clearLightbox() {
-    this.clearContainer();
-    this.$body.classList.remove('lightbox-transition');
-    if (this.closedEvent) document.dispatchEvent(this.closedEvent);
-  }
-
-  clearContainer() {
-    for (let $child of this.$container.children) {
-      if (!$child.classList.contains('lightbox-close')) {
-        if (this.$contentParent) {
-          if (this.contentPosition > 0) {
-            this.$contentParent.insertBefore(this.contentPosition);
-          } else {
-            this.$contentParent.append($child);
-          }
-        } else {
-          $child.remove();
-        }
-      }
-    }
-    this.$contentParent = null;
-    this.contentPosition = null;
-    this.tempClasses = this.tempClasses.filter(c => this.$container.classList.remove(c) && false);
-  }
-
-  openFromElement($el, opts = {}) {
-    if (!($el instanceof Element)) return false;
-    if (!$el.classList.contains('lightbox-loaded')) this.preLoadContent($content);
+  beforeOpen(opts, $el = document) {
     
+    this.$eventElement = $el;
+
+    if (this.customEvent) {
+      if (!this.$eventElement.dispatchEvent(new CustomEvent('lightbox-before-open', { cancelable: true, bubbles: true }))) {
+        return false;
+      }
+    }
+
+    this.beforeContent.push(this.getCloseButton());
+
     if (opts.class) {
       if (typeof opts.class === 'string') opts.class = opts.class.split(' ');
       this.tempClasses = this.tempClasses.concat(opts.class);
     }
+
+    if (typeof opts.closeOnEscape === 'boolean') {
+      this.closeOnEscape = opts.closeOnEscape;
+    }
+
+    if (opts.title || $el.title) {
+      let $title = document.createElement(opts.titleElement || 'h2');
+      $title.innerHTML = opts.title || $el.title;
+      if (opts.titleClass) {
+        if (typeof opts.titleClass === 'string') {
+          opts.titleClass = opts.titleClass.split(' ');
+        }
+      } else {
+        opts.titleClass = [];
+      }
+      opts.titleClass.push('lightbox-title');
+      $title.classList.add(...opts.titleClass);
+
+      this.beforeContent.push($title);
+    }
+
+    if (typeof opts.close === 'function') {
+      let closeFunction = e => {
+        opts.close(e);
+        document.removeEventListener('lightbox-closed', closeFunction);
+      };
+      document.addEventListener('lightbox-closed', closeFunction);
+    }
+
+    if (typeof opts.open === 'function') {
+      let openFunction = e => {
+        opts.open(e);
+        document.removeEventListener('lightbox-opened', openFunction);
+      };
+      document.addEventListener('lightbox-opened', openFunction);
+    }
+
+    if (opts.buttons) {
+      const createButton = btn => {
+        let $btn = document.createElement('button');
+        $btn.type = 'button';
+        $btn.addEventListener('click', btn.click);
+        $btn.innerHTML = btn.text;
+        if (btn.class) {
+          if (typeof btn.class === 'string') {
+            btn.class = btn.class.split(' ');
+          }
+        } else {
+          btn.class = [];
+        }
+        btn.class.push('lightbox-title');
+        $btn.classList.add(...btn.class);
+        return $btn;
+      };
+
+      let $buttons = document.createElement('div');
+      $buttons.classList.add('lightbox-buttons');
+      if (opts.buttons instanceof Array) {
+        opts.buttons.forEach(btn => {
+          $buttons.append(createButton(btn));
+        });
+      } else {
+        Object.keys(opts.buttons).forEach(label => {
+          $buttons.append(
+            createButton({
+              text: label,
+              click: opts.buttons[label]
+            })
+          );
+        });
+      }
+      if ($buttons.children.length) this.afterContent.push($buttons);
+    }
+
+    return true;
+  }
+
+  openFromElement($el, opts = {}) {
+    if (!($el instanceof Element)) return false;
+    if (!$el.classList.contains('lightbox-loaded')) this.preLoadContent($el);
+
+    
     if (opts.copy) {
       $el = this.stringToHTML($el.innerHTML);
     } else {
@@ -199,8 +315,11 @@ class Lightbox extends PFSingleton {
       this.contentPosition = [...$el.parentNode.children].indexOf($el);
     }
 
-    this.open($el);
-    return true;
+    if (this.beforeOpen(opts, $el)) {
+      this.open($el);
+      return true;
+    }
+    return false;
   }
 
   handleClick(e, $a) {
@@ -209,7 +328,12 @@ class Lightbox extends PFSingleton {
     let anchor = $a.dataset.lbAnchor || $a.getAttribute('href'),
       src = $a.dataset.lbSrc || $a.getAttribute('src'),
       content = null,
-      $content = this.getNode('[data-lb-content]', $a) || this.getNode('.lightbox-content', $a);
+      $content = this.getNode('[data-lb-content]', $a) || this.getNode('.lightbox-content', $a),
+      opts = {};
+
+    if ($a.title) {
+      opts.title = $a.title;
+    };
 
     if ($a.dataset.lbIframe) {
       content = this.getIframeContent($a.dataset.lbIframe);
@@ -230,6 +354,7 @@ class Lightbox extends PFSingleton {
           if (!content.classList.contains('lightbox-loaded')) this.preLoadContent(content);
           this.$contentParent = content.parentNode;
           this.contentPosition = [...content.parentNode.children].indexOf(content);
+          this.$eventElement = content;
         } catch (e) {
           this.log(`Error in src: ${src}\n${e}`, 'warn');
         }
@@ -242,13 +367,14 @@ class Lightbox extends PFSingleton {
         content = $content;
         this.$contentParent = content.parentNode;
         this.contentPosition = [...content.parentNode.children].indexOf(content);
+        this.$eventElement = content;
       }
     }
     if ($a.dataset.lbClass) {
       this.tempClasses = this.tempClasses.concat($a.dataset.lbClass.split(' '));
     }
 
-    if (content) this.open(content);
+    if (content && this.beforeOpen(opts, content)) this.open(content);
   }
 
   preLoadContent($content) {
