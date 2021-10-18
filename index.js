@@ -3,6 +3,7 @@ export {Toolkit} from './lib/Toolkit';
 
 export {Lightbox} from './modules/Lightbox/index';
 export {Listen as LightboxListen} from './modules/Lightbox/index';
+export {Open as LightboxOpen} from './modules/Lightbox/index';
 export {LazyMedia} from './modules/LazyMedia/index';
 export {LazyLoad} from './modules/LazyMedia/index';
 export {SmoothScroll} from './modules/SmoothScroll/index';

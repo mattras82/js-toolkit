@@ -307,10 +307,9 @@ class Lightbox extends PFSingleton {
     if (!($el instanceof Element)) return false;
     if (!$el.classList.contains('lightbox-loaded')) this.preLoadContent($el);
 
-    
     if (opts.copy) {
       $el = this.stringToHTML($el.innerHTML);
-    } else {
+    } else if ($el.parentNode) {
       this.$contentParent = $el.parentNode;
       this.contentPosition = [...$el.parentNode.children].indexOf($el);
     }
