@@ -144,6 +144,7 @@ class Lightbox extends PFSingleton {
   }
 
   close() {
+    this.$eventElement = this.$eventElement || document;
     if (window.forceLightboxOpen) {
       if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-forced-open', { bubbles: true }));
       return false;
@@ -151,19 +152,18 @@ class Lightbox extends PFSingleton {
     if (this.customEvent) {
       if (!this.$eventElement.dispatchEvent(new CustomEvent('lightbox-before-close', { cancelable: true, bubbles: true }))) return false;
     }
-    this.$body.classList.remove('lightbox-open');
+    this.$body.classList.add('lightbox-transition');
+    this.timeout(300).then(this.clearLightbox.bind(this));
     if (this.scrollPos > 0) {
       window.scrollTo(0, this.scrollPos);
       this.scrollPos = null;
     }
     document.removeEventListener('keyup', this.keyupListenerRef);
-    this.$body.classList.add('lightbox-transition');
-    this.timeout().then(this.clearLightbox.bind(this));
   }
 
   clearLightbox() {
+    this.$body.classList.remove('lightbox-transition', 'lightbox-open');
     this.clearContainer();
-    this.$body.classList.remove('lightbox-transition');
     if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-closed', { bubbles: true }));
     this.closeOnEscape = true;
     this.$eventElement = null;

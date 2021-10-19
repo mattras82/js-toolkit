@@ -44,7 +44,7 @@ $lightbox-loading-thickness: 16px !default;
 		padding: $lightbox-container-padding;
 		background: $lightbox-container-bg;
 		opacity: 0;
-		transition: none;
+		transition: opacity 0.25s ease-out;
 		z-index: -5;
 		overflow: auto;
 
@@ -168,6 +168,15 @@ $lightbox-loading-thickness: 16px !default;
 			&-container {
 				opacity: 1;
 				z-index: 1999998;
+			}
+		}
+	}
+
+	&-transition {
+		.lightbox {
+			&-overlay,
+			&-container {
+				opacity: 0;
 			}
 		}
 	}
