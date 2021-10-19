@@ -55,7 +55,7 @@ class Lightbox extends PFSingleton {
   }
 
   getCloseButton() {
-    return this.stringToHTML(`<button class="lightbox-close lightbox-keep" type="button" aria-label="Close popup">
+    return this.stringToHTML(`<button class="lightbox-close" type="button" aria-label="Close popup" tabindex="1">
                               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
                                 <path d="M11,14.143,3.143,22,0,18.853,7.855,11,0,3.148,3.142.007,11,7.859,18.856,0,22,3.143,14.14,11,22,18.859,18.857,22Z"/>
                                 </svg>
@@ -159,6 +159,7 @@ class Lightbox extends PFSingleton {
       this.scrollPos = null;
     }
     document.removeEventListener('keyup', this.keyupListenerRef);
+    this.$container.tabIndex = 0;
   }
 
   clearLightbox() {
@@ -217,8 +218,10 @@ class Lightbox extends PFSingleton {
     if (this.afterContent.length) {
       this.afterContent.forEach($el => this.$container.append($el));
     }
-    this.$body.classList.add('lightbox-open');
     this.tempClasses.forEach(c => this.$container.classList.add(c));
+    this.$container.tabIndex = 1;
+    this.$body.classList.add('lightbox-open');
+    this.$container.focus();
     if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-opened', { bubbles: true }));
     this.getNodes('.lightbox-close', this.$container).forEach($e => {
       $e.addEventListener('click', this.close.bind(this));
@@ -281,10 +284,11 @@ class Lightbox extends PFSingleton {
       document.addEventListener('lightbox-opened', openFunction);
     }
 
-    if (opts.buttons) {
+    if (opts.buttons || opts.buttonOk) {
       const createButton = btn => {
         let $btn = document.createElement('button');
         $btn.type = 'button';
+        $btn.tabIndex = 1;
         $btn.addEventListener('click', btn.click);
         $btn.innerHTML = btn.text;
         if (btn.class) {
@@ -304,7 +308,7 @@ class Lightbox extends PFSingleton {
         opts.buttons.forEach(btn => {
           $buttons.append(createButton(btn));
         });
-      } else {
+      } else if (opts.buttons) {
         Object.keys(opts.buttons).forEach(label => {
           $buttons.append(
             createButton({
@@ -313,6 +317,13 @@ class Lightbox extends PFSingleton {
             })
           );
         });
+      } else if (opts.buttonOk) {
+        $buttons.append(
+          createButton({
+            text: 'OK',
+            class: 'lightbox-close'
+          })
+        );
       }
       if ($buttons.children.length) this.afterContent.push($buttons);
     }
