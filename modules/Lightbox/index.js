@@ -104,7 +104,7 @@ class Lightbox extends PFSingleton {
   }
 
   /**
-   * 
+   * Open a lightbox with the given HTML element as the content
    * @param {HTMLElement | String | Object} $el The element, HTML, or jQuery object to be placed into the Lightbox
    * @param {Object | null} opts Options
    * @returns {boolean}
@@ -114,6 +114,9 @@ class Lightbox extends PFSingleton {
     if (!Lightbox.instance) {
       Toolkit.add(Lightbox);
     }
+    if (Lightbox.instance.$body.classList.contains('lightbox-open')) {
+      return false;
+    }
     if (typeof $el === 'string') {
       $el = Lightbox.instance.stringToHTML($el);
     } else if (typeof jQuery === 'function' && $el instanceof jQuery) {
@@ -121,6 +124,21 @@ class Lightbox extends PFSingleton {
     }
     if ($el instanceof HTMLElement) {
       return Lightbox.instance.openFromElement($el, opts);
+    }
+    return false;
+  }
+
+  /**
+   * Closes the lightbox if it's currently open
+   * @returns {boolean}
+   * @constructor
+   */
+  static CloseContent() {
+    if (!Lightbox.instance) {
+      Toolkit.add(Lightbox);
+    }
+    if (Lightbox.instance.$body.classList.contains('lightbox-open')) {
+      return Lightbox.instance.close();
     }
     return false;
   }
@@ -276,7 +294,6 @@ class Lightbox extends PFSingleton {
         } else {
           btn.class = [];
         }
-        btn.class.push('lightbox-title');
         $btn.classList.add(...btn.class);
         return $btn;
       };
@@ -525,4 +542,5 @@ class Lightbox extends PFSingleton {
 
 export const Listen = Lightbox.Listen;
 export const Open = Lightbox.OpenContent;
+export const Close = Lightbox.CloseContent;
 export { Lightbox };
