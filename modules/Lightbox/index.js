@@ -51,11 +51,12 @@ class Lightbox extends PFSingleton {
   addContainer() {
     this.$container = document.createElement('div');
     this.$container.classList.add('lightbox-container');
+    this.$container.setAttribute('role', 'dialog');
     this.$body.append(this.$container);
   }
 
   getCloseButton() {
-    return this.stringToHTML(`<button class="lightbox-close" type="button" aria-label="Close popup" tabindex="1">
+    return this.stringToHTML(`<button class="lightbox-close" type="button" aria-label="Close popup" tabindex="2">
                               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
                                 <path d="M11,14.143,3.143,22,0,18.853,7.855,11,0,3.148,3.142.007,11,7.859,18.856,0,22,3.143,14.14,11,22,18.859,18.857,22Z"/>
                                 </svg>
@@ -144,30 +145,37 @@ class Lightbox extends PFSingleton {
   }
 
   close() {
-    this.$eventElement = this.$eventElement || document;
-    if (window.forceLightboxOpen) {
-      if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-forced-open', { bubbles: true }));
-      return false;
+    if (!this.closing) {
+      this.closing = true;
+      if (window.forceLightboxOpen) {
+        if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-forced-open', { bubbles: true }));
+        this.closing = false;
+        return false;
+      }
+      if (this.customEvent) {
+        if (!this.$eventElement.dispatchEvent(new CustomEvent('lightbox-before-close', { cancelable: true, bubbles: true }))) {
+          this.closing = false;
+          return false;
+        }
+      }
+      this.$body.classList.add('lightbox-transition');
+      this.timeout().then(this.clearLightbox.bind(this));
+      if (this.scrollPos > 0) {
+        window.scrollTo(0, this.scrollPos);
+        this.scrollPos = null;
+      }
+      document.removeEventListener('keyup', this.keyupListenerRef);
+      this.$container.tabIndex = -1;
     }
-    if (this.customEvent) {
-      if (!this.$eventElement.dispatchEvent(new CustomEvent('lightbox-before-close', { cancelable: true, bubbles: true }))) return false;
-    }
-    this.$body.classList.add('lightbox-transition');
-    this.timeout(300).then(this.clearLightbox.bind(this));
-    if (this.scrollPos > 0) {
-      window.scrollTo(0, this.scrollPos);
-      this.scrollPos = null;
-    }
-    document.removeEventListener('keyup', this.keyupListenerRef);
-    this.$container.tabIndex = 0;
   }
 
   clearLightbox() {
     this.$body.classList.remove('lightbox-transition', 'lightbox-open');
-    this.clearContainer();
     if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-closed', { bubbles: true }));
+    this.clearContainer();
     this.closeOnEscape = true;
     this.$eventElement = null;
+    this.closing = false;
   }
 
   clearContainer() {
@@ -202,32 +210,37 @@ class Lightbox extends PFSingleton {
   }
 
   open(content) {
-    if (this.$body.classList.contains('lightbox-transition')) {
-      this.timeout().then(() => {
-        this.open(content);
+    if (!this.opening) {
+      this.opening = true;
+      if (this.$body.classList.contains('lightbox-transition')) {
+        this.timeout().then(() => {
+          this.open(content);
+        });
+        this.opening = false;
+        return false;
+      }
+      if (this.isIOS()) {
+        this.scrollPos = window.scrollY ? window.scrollY : window.pageYOffset;
+      }
+      if (this.beforeContent.length) {
+        this.beforeContent.forEach($el => this.$container.append($el));
+      }
+      this.$container.append(content);
+      if (this.afterContent.length) {
+        this.afterContent.forEach($el => this.$container.append($el));
+      }
+      this.tempClasses.forEach(c => this.$container.classList.add(c));
+      this.$container.tabIndex = 1;
+      this.$body.classList.add('lightbox-open');
+      this.$container.focus();
+      if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-opened', { bubbles: true }));
+      this.getNodes('.lightbox-close', this.$container).forEach($e => {
+        $e.addEventListener('click', this.close.bind(this));
       });
-      return false;
-    }
-    if (this.isIOS()) {
-      this.scrollPos = window.scrollY ? window.scrollY : window.pageYOffset;
-    }
-    if (this.beforeContent.length) {
-      this.beforeContent.forEach($el => this.$container.append($el));
-    }
-    this.$container.append(content);
-    if (this.afterContent.length) {
-      this.afterContent.forEach($el => this.$container.append($el));
-    }
-    this.tempClasses.forEach(c => this.$container.classList.add(c));
-    this.$container.tabIndex = 1;
-    this.$body.classList.add('lightbox-open');
-    this.$container.focus();
-    if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-opened', { bubbles: true }));
-    this.getNodes('.lightbox-close', this.$container).forEach($e => {
-      $e.addEventListener('click', this.close.bind(this));
-    });
-    if (this.closeOnEscape) {
-      document.addEventListener('keyup', this.keyupListenerRef);
+      if (this.closeOnEscape) {
+        document.addEventListener('keyup', this.keyupListenerRef);
+      }
+      this.opening = false;
     }
   }
 
@@ -270,26 +283,28 @@ class Lightbox extends PFSingleton {
 
     if (typeof opts.close === 'function') {
       let closeFunction = e => {
-        opts.close(e);
-        document.removeEventListener('lightbox-closed', closeFunction);
+        opts.close.bind($el)(e);
+        $el.removeEventListener('lightbox-closed', closeFunction);
       };
-      document.addEventListener('lightbox-closed', closeFunction);
+      $el.addEventListener('lightbox-closed', closeFunction);
     }
 
     if (typeof opts.open === 'function') {
       let openFunction = e => {
-        opts.open(e);
-        document.removeEventListener('lightbox-opened', openFunction);
+        opts.open.bind($el)(e);
+        $el.removeEventListener('lightbox-opened', openFunction);
       };
-      document.addEventListener('lightbox-opened', openFunction);
+      $el.addEventListener('lightbox-opened', openFunction);
     }
 
-    if (opts.buttons || opts.buttonOk) {
+    if (opts.buttons) {
       const createButton = btn => {
         let $btn = document.createElement('button');
         $btn.type = 'button';
         $btn.tabIndex = 1;
-        $btn.addEventListener('click', btn.click);
+        if (typeof btn.click === 'function') {
+          $btn.addEventListener('click', btn.click.bind($el));
+        }
         $btn.innerHTML = btn.text;
         if (btn.class) {
           if (typeof btn.class === 'string') {
@@ -317,13 +332,6 @@ class Lightbox extends PFSingleton {
             })
           );
         });
-      } else if (opts.buttonOk) {
-        $buttons.append(
-          createButton({
-            text: 'OK',
-            class: 'lightbox-close'
-          })
-        );
       }
       if ($buttons.children.length) this.afterContent.push($buttons);
     }
