@@ -173,6 +173,8 @@ $lightbox-loading-thickness: 16px !default;
 	}
 
 	&-transition {
+		overflow: auto;
+		
 		.lightbox {
 			&-overlay,
 			&-container {
