@@ -5,6 +5,8 @@ import { LazyLoad } from "../LazyMedia";
 
 class Lightbox extends PFSingleton {
 
+  iOSBodySelector = '#form, .off-canvas-wrapper, main, body > div';
+
   constructor() {
     super('.lightbox, [data-lb-src], [data-lb-iframe], [data-lb-anchor]', 'Lightbox');
     this.defaultTimeout = 350;
@@ -33,7 +35,7 @@ class Lightbox extends PFSingleton {
   addElements() {
     let bodySelector = 'body';
     if (this.isIOS()) {
-      bodySelector = '#form, .off-canvas-content, main, body > div';
+      bodySelector = this.iOSBodySelector;
     }
     this.$body = this.getNode(bodySelector);
     this.addOverlay();
