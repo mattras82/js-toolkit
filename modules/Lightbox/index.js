@@ -117,9 +117,6 @@ class Lightbox extends PFSingleton {
     if (!Lightbox.instance) {
       Toolkit.add(Lightbox);
     }
-    if (Lightbox.instance.$body.classList.contains('lightbox-open')) {
-      return false;
-    }
     if (typeof $el === 'string') {
       $el = Lightbox.instance.stringToHTML($el);
     } else if (typeof jQuery === 'function' && $el instanceof jQuery) {
@@ -345,10 +342,13 @@ class Lightbox extends PFSingleton {
     if (!($el instanceof Element)) return false;
     if (!$el.classList.contains('lightbox-loaded')) this.preLoadContent($el);
 
-    if (this.closing || this.opening) {
-        this.timeout().then(() => {
-            this.openFromElement($el, opts);
-        });
+    if (this.opening) {
+      this.close();
+    }
+    if (this.closing) {
+      this.timeout().then(() => {
+        this.openFromElement($el, opts);
+      });
     }
 
     if (opts.copy) {
@@ -368,10 +368,13 @@ class Lightbox extends PFSingleton {
   handleClick(e, $a) {
     e.preventDefault();
 
-    if (this.closing || this.opening) {
-        this.timeout().then(() => {
-            this.handleClick(e, $a);
-        });
+    if (this.opening) {
+      this.close();
+    }
+    if (this.closing) {
+      this.timeout().then(() => {
+        this.handleClick(e, $a);
+      });
     }
 
     let anchor = $a.dataset.lbAnchor || $a.getAttribute('href'),
