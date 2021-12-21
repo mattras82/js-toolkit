@@ -63,7 +63,7 @@ class Lightbox extends PFSingleton {
                                 <path d="M11,14.143,3.143,22,0,18.853,7.855,11,0,3.148,3.142.007,11,7.859,18.856,0,22,3.143,14.14,11,22,18.859,18.857,22Z"/>
                                 </svg>
                               </button>`
-                            );
+    );
   }
 
   addListeners() {
@@ -247,7 +247,7 @@ class Lightbox extends PFSingleton {
   }
 
   beforeOpen(opts, $el = document) {
-    
+
     this.$eventElement = $el;
 
     if (this.customEvent) {
@@ -345,6 +345,12 @@ class Lightbox extends PFSingleton {
     if (!($el instanceof Element)) return false;
     if (!$el.classList.contains('lightbox-loaded')) this.preLoadContent($el);
 
+    if (this.closing || this.opening) {
+        this.timeout().then(() => {
+            this.openFromElement($el, opts);
+        });
+    }
+
     if (opts.copy) {
       $el = this.stringToHTML($el.innerHTML);
     } else if ($el.parentNode) {
@@ -361,6 +367,12 @@ class Lightbox extends PFSingleton {
 
   handleClick(e, $a) {
     e.preventDefault();
+
+    if (this.closing || this.opening) {
+        this.timeout().then(() => {
+            this.handleClick(e, $a);
+        });
+    }
 
     let anchor = $a.dataset.lbAnchor || $a.getAttribute('href'),
       src = $a.dataset.lbSrc || $a.getAttribute('src'),
