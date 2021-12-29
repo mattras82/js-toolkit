@@ -172,6 +172,7 @@ class Lightbox extends PFSingleton {
     this.$body.classList.remove('lightbox-transition', 'lightbox-open');
     if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-closed', { bubbles: true }));
     this.clearContainer();
+    if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-cleared', { bubbles: true }));
     this.closeOnEscape = true;
     this.$eventElement = null;
     this.closing = false;
@@ -231,7 +232,7 @@ class Lightbox extends PFSingleton {
       this.tempClasses.forEach(c => this.$container.classList.add(c));
       this.$container.tabIndex = 1;
       this.$body.classList.add('lightbox-open');
-      this.$container.focus();
+      this.$eventElement.focus();
       if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-opened', { bubbles: true }));
       this.getNodes('.lightbox-close', this.$container).forEach($e => {
         $e.addEventListener('click', this.close.bind(this));
@@ -343,12 +344,13 @@ class Lightbox extends PFSingleton {
     if (!$el.classList.contains('lightbox-loaded')) this.preLoadContent($el);
 
     if (this.opening) {
-      this.close();
+      return false;
     }
     if (this.closing) {
-      this.timeout().then(() => {
+      this.timeout(100).then(() => {
         this.openFromElement($el, opts);
       });
+      return false;
     }
 
     if (opts.copy) {
@@ -369,12 +371,13 @@ class Lightbox extends PFSingleton {
     e.preventDefault();
 
     if (this.opening) {
-      this.close();
+      return false;
     }
     if (this.closing) {
-      this.timeout().then(() => {
+      this.timeout(100).then(() => {
         this.handleClick(e, $a);
       });
+      return false;
     }
 
     let anchor = $a.dataset.lbAnchor || $a.getAttribute('href'),
