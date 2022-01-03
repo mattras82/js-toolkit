@@ -6,6 +6,7 @@ import { LazyLoad } from "../LazyMedia";
 class Lightbox extends PFSingleton {
 
   iOSBodySelector = '#form, .off-canvas-wrapper, main, body > div';
+  transparentClasses = ['lightbox-image', 'lightbox-video', 'lightbox-iframe'];
 
   constructor() {
     super('.lightbox, [data-lb-src], [data-lb-iframe], [data-lb-anchor]', 'Lightbox');
@@ -70,9 +71,8 @@ class Lightbox extends PFSingleton {
     this.getNodes('.lightbox-close', this.$container).forEach($cl => $cl.addEventListener('click', this.close.bind(this)));
     this.$overlay.addEventListener('click', this.close.bind(this));
     this.$container.addEventListener('click', e => {
-      let transparentClasses = ['lightbox-image', 'lightbox-video', 'lightbox-iframe'];
       let closed = false;
-      transparentClasses.forEach(name => {
+      this.transparentClasses.forEach(name => {
         if (!closed && e.target && e.target.classList.contains(name)) {
           closed = true;
           this.close();
