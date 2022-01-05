@@ -230,13 +230,18 @@ By default, any content on the same page is "cut" from its original place in the
 ```
 
 ## JavaScript Events
-JavaScript events emitted by this module are:
+All of the events are dispatched on the element that is sent to be opened in the lightbox, and they will bubble up the DOM as needed. Some events are cancelable, which will halt the current operation if canceld. 
 
-|Name|Triggered Element|Description|
+The JavaScript events emitted by this module are:
+
+|Name|Cancelable|Description|
 |:---|:---|:---|
-|lightbox-opened| document| Fired after the "lightbox-open" class has been added, which makes the lightbox visible to the user.|
-|lightbox-closed| document| Fired after the container element has been cleared of the contents and the "lightbox-transition" class has been removed.|
-|lightbox-forced-open| document| Fired when the lightbox begins the close() method, but the window.forceLightboxOpen variable is set to true. This event is used by other modules that force a lightbox to stay open (requiring user interaction).|
+|lightbox-before-open| yes| Fired after the element to be opened has been determined, and before any options have been determined.|
+|lightbox-opened| no| Fired after the "lightbox-open" class has been added, which makes the lightbox visible to the user.|
+|lightbox-before-close| yes| Fired when the lightbox begins the close() method.|
+|lightbox-closed| no| Fired after the "lightbox-open" class has been removed, which hides the lightbox.|
+|lightbox-cleared| no| Fired after the container element has been cleared of the contents and the module has returned to a neutral state.|
+|lightbox-forced-open| no| Fired when the lightbox begins the close() method, but the window.forceLightboxOpen variable is set to true. This event is used by other modules that force a lightbox to stay open (requiring user interaction).|
 
 ## JavaScript Exports
 The module exports a few helper functions so that you can use the Smooth Scroll functionality after page load.
@@ -264,11 +269,68 @@ $('.custom-links').each(function() {
 });
 ```
 
+### LightboxOpen()
+This function opens the Lightbox with the given HTML or jQuery element and an optional set of configuration options.
+
+Parameters:
+- `$el` *Element* DOM element that will go in the lightbox
+- `opts` *Object* Object with configuration options
+
+Returns *boolean*
+
+#### Example
+```javascript
+import {LightboxOpen} from 'public-function-toolkit';
+
+// ES6 syntax
+let $element = document.querySelector('#modal');
+LightboxOpen($anchor);
+
+// jQuery syntax
+let $el = $('#modal');
+let options = {
+  class: 'custom-class',
+  title: 'My jQuery Element'
+};
+LightboxOpen($el, options);
+```
+
+#### Supported Options
+|Name|Type|Description|
+|:---|:---|:---|
+|class| String/Array| Class (or classes) to add to the lightbox container element. This is the same as using the `data-lb-class` HTML option.
+|closeOnEscape| Boolean| Determines whether or not to add a keyup listener that will close the lightbox when the ESC button is pushed.
+|title| String| Text for a prepended title element.
+|titleElement| String| The element tag for the title element. Defaults to 'h2'.
+|titleClass| String/Array|  Class (or classes) to add to the title element.
+|close| Function|  A function that runs when the `lightbox-close` event fires. The function will only run once, and binds the `$el` variable as the `this` value.
+|open| Function|  A function that runs when the `lightbox-opened` event fires. The function will only run once, and binds the `$el` variable as the `this` value.
+|buttons| Array/Object|  A list of objects that define one or more buttons to append to the lightbox. If this property is an array, each object supports 3 values: `text`, `class`, `click`. If this property is an object, each key of the object will be the button text, and the value should be a function that will be added as the `click` listener.
+
+### LightboxClose()
+This function will close the lightbox, if applicable.
+
+Returns *boolean*
+
+#### Example
+```javascript
+import {LightboxClose} from 'public-function-toolkit';
+
+let closeLightbox = true;
+if (closeLightbox) {
+  LightboxClose();
+}
+```
+
 ## SASS Reference
 
 |Name|Type|Default Value|Description|
 |:---|:---|:---|:---|
 |$lightbox-container-bg| Color| $white or #ffffff| The background color of the main container.
+|$lightbox-container-margin| Number| 1rem| The margin value of the main container.
+|$lightbox-container-padding| Number| 1rem| The padding value of the main container.
+|$lightbox-overlay-opacity| Number| 0.95| The opacity of the overlay element.
+|$lightbox-overlay-color| Color| #333333| The color of the overlay element.
 |$lightbox-loading-color| Color| get-color(primary) or #349bd7| The color of the loading spinner element when an image, video, or iframe is loading in the lightbox.
 |$lightbox-loading-size| Number| 120px| The size of the loading spinner element.
 |$lightbox-loading-thickness| Number| 16px| The thickness of the loading spinner element.
