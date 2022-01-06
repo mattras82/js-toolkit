@@ -160,7 +160,10 @@ class Lightbox extends PFSingleton {
       this.$body.classList.add('lightbox-transition');
       this.timeout().then(this.clearLightbox.bind(this));
       if (this.scrollPos > 0) {
+        // Keeping this line for IE compatibility (for now)
         window.scrollTo(0, this.scrollPos);
+        // Forcing the scroll to instant in case the site is using CSS for smooth scrolling
+        window.scrollTo({top:this.scrollPos,behavior:'instant'});
         this.scrollPos = null;
       }
       document.removeEventListener('keyup', this.keyupListenerRef);
