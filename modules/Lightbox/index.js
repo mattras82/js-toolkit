@@ -268,9 +268,9 @@ class Lightbox extends PFSingleton {
       this.closeOnEscape = opts.closeOnEscape;
     }
 
-    if (opts.title || $el.title) {
+    if (opts.title || $el.getAttribute('title')) {
       let $title = document.createElement(opts.titleElement || 'h2');
-      $title.innerHTML = opts.title || $el.title;
+      $title.innerHTML = opts.title || $el.getAttribute('title');
       if (opts.titleClass) {
         if (typeof opts.titleClass === 'string') {
           opts.titleClass = opts.titleClass.split(' ');
