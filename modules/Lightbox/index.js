@@ -1,7 +1,7 @@
 "use strict";
 require('./styles.scss');
 import PFSingleton from '../../lib/PFSingleton';
-import { LazyLoad } from "../LazyMedia";
+import Toolkit from '../../lib/Toolkit';
 
 class Lightbox extends PFSingleton {
 
@@ -438,7 +438,13 @@ class Lightbox extends PFSingleton {
   preLoadContent($content) {
     this.getNodes('img[data-src]', $content).forEach($img => {
       if (!$img.classList.contains('loaded')) {
-        LazyLoad($img);
+        let lm = Toolkit.getModule('LazyMedia');
+        if (lm && lm.checkQueue) {
+          lm.checkQueue($img);
+        } else {
+          $img.loading = 'loading';
+          $img.src = $img.dataset.src;
+        }
       }
     });
     this.getNodes('noscript', $content).forEach($n => $n.remove());
