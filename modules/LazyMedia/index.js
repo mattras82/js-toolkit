@@ -3,7 +3,7 @@ import { Toolkit } from "../../lib/Toolkit";
 
 require('./styles.scss');
 import PFSingleton from '../../lib/PFSingleton';
-import SVGInject from '@iconfu/svg-inject';
+require('@iconfu/svg-inject');
 
 const selectors = 'img[data-src], img[data-srcset], source[data-src], source[data-srcset], video[data-poster], [data-lazy-bg]';
 
