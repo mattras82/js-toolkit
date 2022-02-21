@@ -284,17 +284,17 @@ class Lightbox extends PFSingleton {
       this.beforeContent.push($title);
     }
 
-    if (typeof opts.close === 'function') {
+    if (typeof opts.onClose === 'function') {
       let closeFunction = e => {
-        opts.close.bind($el)(e);
+        opts.onClose.bind($el)(e);
         $el.removeEventListener('lightbox-closed', closeFunction);
       };
       $el.addEventListener('lightbox-closed', closeFunction);
     }
 
-    if (typeof opts.open === 'function') {
+    if (typeof opts.onOpen === 'function') {
       let openFunction = e => {
-        opts.open.bind($el)(e);
+        opts.onOpen.bind($el)(e);
         $el.removeEventListener('lightbox-opened', openFunction);
       };
       $el.addEventListener('lightbox-opened', openFunction);

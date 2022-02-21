@@ -303,8 +303,8 @@ LightboxOpen($el, options);
 |title| String| Text for a prepended title element.
 |titleElement| String| The element tag for the title element. Defaults to 'h2'.
 |titleClass| String/Array|  Class (or classes) to add to the title element.
-|close| Function|  A function that runs when the `lightbox-close` event fires. The function will only run once, and binds the `$el` variable as the `this` value.
-|open| Function|  A function that runs when the `lightbox-opened` event fires. The function will only run once, and binds the `$el` variable as the `this` value.
+|onClose| Function|  A function that runs when the `lightbox-close` event fires. The function will only run once, and binds the `$el` variable as the `this` value.
+|onOpen| Function|  A function that runs when the `lightbox-opened` event fires. The function will only run once, and binds the `$el` variable as the `this` value.
 |buttons| Array/Object|  A list of objects that define one or more buttons to append to the lightbox. If this property is an array, each object supports 3 values: `text`, `class`, `click`. If this property is an object, each key of the object will be the button text, and the value should be a function that will be added as the `click` listener.
 
 ### LightboxClose()
