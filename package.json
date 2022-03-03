@@ -1,6 +1,6 @@
 {
   "name": "public-function-toolkit",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A collection of JavaScript modules & tools developed by Public Function",
   "main": "index.js",
   "scripts": {
@@ -51,8 +51,7 @@
     "last 2 Safari versions",
     "last 2 iOS versions",
     "last 1 Android version",
-    "last 1 ChromeAndroid version",
-    "ie 11"
+    "last 1 ChromeAndroid version"
   ],
   "license": "MIT",
   "sideEffects": false

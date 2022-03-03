@@ -1,6 +1,14 @@
 # Public Functions's JavaScript Toolkit Changelog
 
-## Current Version: 1.0.2
+## Current Version: 1.1.0
+
+### 1.1.0
+
+Released on 03 Mar 2022
+
+ - Major updates to Lightbox functionality. See documentation for details
+ - Adding ability to force init of a module if no elements are on the page
+ - Improving accessibility & browser compatibility of Lightbox
 
 ### 1.0.2
 
