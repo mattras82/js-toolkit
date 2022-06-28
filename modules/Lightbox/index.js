@@ -7,6 +7,7 @@ class Lightbox extends PFSingleton {
 
   iOSBodySelector = '#form, .off-canvas-wrapper, main, body > div';
   transparentClasses = ['lightbox-image', 'lightbox-video', 'lightbox-iframe'];
+  focusableElementsString = "a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]";
 
   constructor() {
     super('.lightbox, [data-lb-src], [data-lb-iframe], [data-lb-anchor]', 'Lightbox');
@@ -48,6 +49,8 @@ class Lightbox extends PFSingleton {
   addOverlay() {
     this.$overlay = document.createElement('div');
     this.$overlay.classList.add('lightbox-overlay');
+    this.$overlay.ariaHidden = 'true';
+    this.$overlay.tabIndex = -1;
     this.$body.append(this.$overlay);
   }
 
@@ -55,6 +58,7 @@ class Lightbox extends PFSingleton {
     this.$container = document.createElement('div');
     this.$container.classList.add('lightbox-container');
     this.$container.setAttribute('role', 'dialog');
+    this.$container.ariaModal = 'true';
     this.$body.append(this.$container);
   }
 
@@ -84,7 +88,25 @@ class Lightbox extends PFSingleton {
   }
 
   keyupListener(e) {
-    if (this.$body.classList.contains('lightbox-open') && e.code === 'Escape') {
+    if (e.keyCode === 9) {
+      // TODO : Implement the tab stop list
+      // SHIFT + TAB
+      if (e.shiftKey) {
+        if (document.activeElement === firstTabStop) {
+          e.preventDefault();
+          lastTabStop.focus();
+        }
+
+      // TAB
+      } else {
+        if (document.activeElement === lastTabStop) {
+          e.preventDefault();
+          firstTabStop.focus();
+        }
+      }
+    }
+
+    if (this.closeOnEscape && this.$body.classList.contains('lightbox-open') && e.code === 'Escape') {
       this.close();
     }
   }
@@ -168,6 +190,7 @@ class Lightbox extends PFSingleton {
       }
       document.removeEventListener('keyup', this.keyupListenerRef);
       this.$container.tabIndex = -1;
+      // TODO : restore focus to the old document.activeElement here & clear/restore aria-hidden atts
     }
   }
 
@@ -210,11 +233,13 @@ class Lightbox extends PFSingleton {
     this.$contentParent = null;
     this.contentPosition = null;
     this.tempClasses = this.tempClasses.filter(c => this.$container.classList.remove(c) && false);
+    // TODO : Clear aria-labelledby & aria-label atts
   }
 
   open(content) {
     if (!this.opening) {
       this.opening = true;
+      // TODO : save the document.activeElement here
       if (this.$body.classList.contains('lightbox-transition')) {
         this.timeout().then(() => {
           this.open(content);
@@ -232,17 +257,20 @@ class Lightbox extends PFSingleton {
       if (this.afterContent.length) {
         this.afterContent.forEach($el => this.$container.append($el));
       }
+      // TODO : Grab the .lightbox-title, .h2, etc element, 
+      // add an ID, & set the ID to aria-labelledby. If we
+      // don't have one, then we need to fall back to aria-label.
       this.tempClasses.forEach(c => this.$container.classList.add(c));
-      this.$container.tabIndex = 1;
+      this.$container.tabIndex = 0;
       this.$body.classList.add('lightbox-open');
+      // TODO : Update aria-hidden atts for neighboring els to $container. Make sure to store any existing values
+      // TODO : Change this to the first focusable element
       this.$eventElement.focus();
       if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-opened', { bubbles: true }));
       this.getNodes('.lightbox-close', this.$container).forEach($e => {
         $e.addEventListener('click', this.close.bind(this));
       });
-      if (this.closeOnEscape) {
-        document.addEventListener('keyup', this.keyupListenerRef);
-      }
+      document.addEventListener('keyup', this.keyupListenerRef);
       this.opening = false;
     }
   }
