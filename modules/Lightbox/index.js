@@ -89,19 +89,17 @@ class Lightbox extends PFSingleton {
 
   keyupListener(e) {
     if (e.keyCode === 9) {
-      // TODO : Implement the tab stop list
-      // SHIFT + TAB
       if (e.shiftKey) {
-        if (document.activeElement === firstTabStop) {
+        // SHIFT + TAB
+        if (document.activeElement === this.$firstTabStop) {
           e.preventDefault();
-          lastTabStop.focus();
+          this.$lastTabStop.focus();
         }
-
-      // TAB
       } else {
-        if (document.activeElement === lastTabStop) {
+        // TAB
+        if (document.activeElement === this.$lastTabStop) {
           e.preventDefault();
-          firstTabStop.focus();
+          this.$firstTabStop.focus();
         }
       }
     }
@@ -190,7 +188,24 @@ class Lightbox extends PFSingleton {
       }
       document.removeEventListener('keyup', this.keyupListenerRef);
       this.$container.tabIndex = -1;
-      // TODO : restore focus to the old document.activeElement here & clear/restore aria-hidden atts
+      [...this.$container.parentElement.children].forEach($e => {
+        if ($e !== this.$container && $e !== this.$overlay && $e.nodeName !== 'SCRIPT') {
+          if ($e.dataset.oldAh) {
+            $e.ariaHidden = $e.dataset.oldAh;
+            $e.removeAttribute('data-old-ah');
+          } else {
+            $e.removeAttribute('aria-hidden');
+          }
+          if ($e.dataset.oldTi) {
+            $e.tabIndex = $e.dataset.oldTi;
+            $e.removeAttribute('data-old-ti');
+          } else {
+            $e.removeAttribute('tab-index');
+          }
+        }
+      });
+      this.$returnFocusEl.focus();
+      this.$returnFocusEl = null;
     }
   }
 
@@ -201,6 +216,9 @@ class Lightbox extends PFSingleton {
     if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-cleared', { bubbles: true }));
     this.closeOnEscape = true;
     this.$eventElement = null;
+    this.$tabableElements = [];
+    this.$firstTabStop = null;
+    this.$lastTabStop = null;
     this.closing = false;
   }
 
@@ -233,13 +251,14 @@ class Lightbox extends PFSingleton {
     this.$contentParent = null;
     this.contentPosition = null;
     this.tempClasses = this.tempClasses.filter(c => this.$container.classList.remove(c) && false);
-    // TODO : Clear aria-labelledby & aria-label atts
+    this.$container.removeAttribute('aria-label');
+    this.$container.removeAttribute('aria-labelledby');
   }
 
   open(content) {
     if (!this.opening) {
       this.opening = true;
-      // TODO : save the document.activeElement here
+      this.$returnFocusEl = document.activeElement;
       if (this.$body.classList.contains('lightbox-transition')) {
         this.timeout().then(() => {
           this.open(content);
@@ -257,15 +276,34 @@ class Lightbox extends PFSingleton {
       if (this.afterContent.length) {
         this.afterContent.forEach($el => this.$container.append($el));
       }
-      // TODO : Grab the .lightbox-title, .h2, etc element, 
-      // add an ID, & set the ID to aria-labelledby. If we
-      // don't have one, then we need to fall back to aria-label.
+      this.$tabableElements = [...this.$container.querySelectorAll(this.focusableElementsString)];
+      this.$firstTabStop = this.$tabableElements[0];
+      this.$lastTabStop = this.$tabableElements[this.$tabableElements.length - 1];
+      let $title = this.$container.querySelector('.lightbox-title, h1, .h1, h2, .h2')
+      if ($title) {
+        $title.id = 'lightbox-aria-label';
+        this.$container.setAttribute('aria-labelledby', 'lightbox-aria-label');
+      } else if (this.$tabableElements.filter($e => !$e.classList.contains('lightbox-close')).length) {
+        this.$container.ariaLabel = 'Your response is needed'
+      } else {
+        this.$container.ariaLabel = 'Informative Message';
+      }
       this.tempClasses.forEach(c => this.$container.classList.add(c));
       this.$container.tabIndex = 0;
       this.$body.classList.add('lightbox-open');
-      // TODO : Update aria-hidden atts for neighboring els to $container. Make sure to store any existing values
-      // TODO : Change this to the first focusable element
-      this.$eventElement.focus();
+      [...this.$container.parentElement.children].forEach($e => {
+        if ($e !== this.$container && $e !== this.$overlay && $e.nodeName !== 'SCRIPT') {
+          if ($e.ariaHidden) {
+            $e.setAttribute('data-old-ah', $e.ariaHidden);
+          }
+          if ($e.tabIndex) {
+            $e.setAttribute('data-old-ti', $e.tabIndex);
+          }
+          $e.ariaHidden = 'true';
+          $e.tabIndex = -1;
+        }
+      });
+      this.$firstTabStop.focus();
       if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-opened', { bubbles: true }));
       this.getNodes('.lightbox-close', this.$container).forEach($e => {
         $e.addEventListener('click', this.close.bind(this));
