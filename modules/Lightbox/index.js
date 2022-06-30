@@ -7,7 +7,7 @@ class Lightbox extends PFSingleton {
 
   iOSBodySelector = '#form, .off-canvas-wrapper, main, body > div';
   transparentClasses = ['lightbox-image', 'lightbox-video', 'lightbox-iframe'];
-  focusableElementsString = "a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]";
+  focusableElementsString = "a[href], area[href], input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]";
 
   constructor() {
     super('.lightbox, [data-lb-src], [data-lb-iframe], [data-lb-anchor]', 'Lightbox');
@@ -63,7 +63,7 @@ class Lightbox extends PFSingleton {
   }
 
   getCloseButton() {
-    return this.stringToHTML(`<button class="lightbox-close" type="button" aria-label="Close popup" tabindex="2">
+    return this.stringToHTML(`<button class="lightbox-close" type="button" aria-label="Close popup">
                               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
                                 <path d="M11,14.143,3.143,22,0,18.853,7.855,11,0,3.148,3.142.007,11,7.859,18.856,0,22,3.143,14.14,11,22,18.859,18.857,22Z"/>
                                 </svg>
@@ -84,10 +84,10 @@ class Lightbox extends PFSingleton {
       });
     });
     this.$elements.forEach($el => $el.addEventListener('click', e => { this.handleClick(e, $el); }));
-    this.keyupListenerRef = this.keyupListener.bind(this);
+    this.keydownListenerRef = this.keydownListener.bind(this);
   }
 
-  keyupListener(e) {
+  keydownListener(e) {
     if (e.keyCode === 9) {
       if (e.shiftKey) {
         // SHIFT + TAB
@@ -186,7 +186,7 @@ class Lightbox extends PFSingleton {
         window.scrollTo({top:this.scrollPos,behavior:'instant'});
         this.scrollPos = null;
       }
-      document.removeEventListener('keyup', this.keyupListenerRef);
+      document.removeEventListener('keydown', this.keydownListenerRef);
       this.$container.tabIndex = -1;
       [...this.$container.parentElement.children].forEach($e => {
         if ($e !== this.$container && $e !== this.$overlay && $e.nodeName !== 'SCRIPT') {
@@ -308,7 +308,7 @@ class Lightbox extends PFSingleton {
       this.getNodes('.lightbox-close', this.$container).forEach($e => {
         $e.addEventListener('click', this.close.bind(this));
       });
-      document.addEventListener('keyup', this.keyupListenerRef);
+      document.addEventListener('keydown', this.keydownListenerRef);
       this.opening = false;
     }
   }
