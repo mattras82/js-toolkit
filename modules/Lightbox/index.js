@@ -212,6 +212,15 @@ class Lightbox extends PFSingleton {
   clearLightbox() {
     this.$body.classList.remove('lightbox-transition', 'lightbox-open');
     if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-closed', { bubbles: true }));
+    let $label = this.$container.querySelector('#lightbox-aria-label');
+    if ($label) {
+      if ($label.dataset.oldId) {
+        $label.id = $label.dataset.oldId;
+        $label.removeAttribute('data-old-id');
+      } else {
+        $label.removeAttribute('id');
+      }
+    }
     this.clearContainer();
     if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-cleared', { bubbles: true }));
     this.closeOnEscape = true;
@@ -281,6 +290,9 @@ class Lightbox extends PFSingleton {
       this.$lastTabStop = this.$tabableElements[this.$tabableElements.length - 1];
       let $title = this.$container.querySelector('.lightbox-title, h1, .h1, h2, .h2')
       if ($title) {
+        if ($title.id) {
+          $title.setAttribute('data-old-id', $title.id);
+        }
         $title.id = 'lightbox-aria-label';
         this.$container.setAttribute('aria-labelledby', 'lightbox-aria-label');
       } else if (this.$tabableElements.filter($e => !$e.classList.contains('lightbox-close')).length) {
