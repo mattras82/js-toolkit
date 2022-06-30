@@ -305,10 +305,10 @@ class Lightbox extends PFSingleton {
       this.$body.classList.add('lightbox-open');
       [...this.$container.parentElement.children].forEach($e => {
         if ($e !== this.$container && $e !== this.$overlay && $e.nodeName !== 'SCRIPT') {
-          if ($e.ariaHidden) {
+          if ($e.ariaHidden && !$e.dataset.oldAh) {
             $e.setAttribute('data-old-ah', $e.ariaHidden);
           }
-          if ($e.tabIndex) {
+          if ($e.tabIndex && !$e.dataOldTi) {
             $e.setAttribute('data-old-ti', $e.tabIndex);
           }
           $e.ariaHidden = 'true';
@@ -382,7 +382,6 @@ class Lightbox extends PFSingleton {
       const createButton = btn => {
         let $btn = document.createElement('button');
         $btn.type = 'button';
-        $btn.tabIndex = 1;
         if (typeof btn.click === 'function') {
           $btn.addEventListener('click', btn.click.bind($el));
         }
