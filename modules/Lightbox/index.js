@@ -59,6 +59,7 @@ class Lightbox extends PFSingleton {
     this.$container.classList.add('lightbox-container');
     this.$container.setAttribute('role', 'dialog');
     this.$container.ariaModal = 'true';
+    this.$container.setAttribute('aria-describedby', 'lightbox-aria-desc');
     this.$body.append(this.$container);
   }
 
@@ -212,6 +213,14 @@ class Lightbox extends PFSingleton {
   clearLightbox() {
     this.$body.classList.remove('lightbox-transition', 'lightbox-open');
     if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-closed', { bubbles: true }));
+    let $desc = this.$container.querySelector('#lightbox-aria-desc');
+    if ($desc) {
+      $desc.removeAttribute('id');
+      if ($desc.dataset.oldId) {
+        $desc.id = $desc.dataset.oldId;
+        $desc.removeAttribute('data-old-id');
+      }
+    }
     let $label = this.$container.querySelector('#lightbox-aria-label');
     if ($label) {
       if ($label.dataset.oldId) {
@@ -261,7 +270,6 @@ class Lightbox extends PFSingleton {
     this.contentPosition = null;
     this.tempClasses = this.tempClasses.filter(c => this.$container.classList.remove(c) && false);
     this.$container.removeAttribute('aria-label');
-    this.$container.removeAttribute('aria-labelledby');
   }
 
   open(content) {
@@ -281,6 +289,10 @@ class Lightbox extends PFSingleton {
       if (this.beforeContent.length) {
         this.beforeContent.forEach($el => this.$container.append($el));
       }
+      if (content.id && !content.dataset.oldId) {
+        content.setAttribute('dataset-old-id', content.id);
+      }
+      content.id = 'lightbox-aria-desc';
       this.$container.append(content);
       if (this.afterContent.length) {
         this.afterContent.forEach($el => this.$container.append($el));
@@ -308,7 +320,7 @@ class Lightbox extends PFSingleton {
           if ($e.ariaHidden && !$e.dataset.oldAh) {
             $e.setAttribute('data-old-ah', $e.ariaHidden);
           }
-          if ($e.tabIndex && !$e.dataOldTi) {
+          if ($e.tabIndex && !$e.dataset.oldTi) {
             $e.setAttribute('data-old-ti', $e.tabIndex);
           }
           $e.ariaHidden = 'true';
