@@ -1,6 +1,6 @@
 {
   "name": "public-function-toolkit",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A collection of JavaScript modules & tools developed by Public Function",
   "main": "index.js",
   "scripts": {

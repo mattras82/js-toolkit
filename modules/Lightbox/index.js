@@ -291,7 +291,7 @@ class Lightbox extends PFSingleton {
         this.beforeContent.forEach($el => this.$container.append($el));
       }
       if (content.id && !content.dataset.oldId) {
-        content.setAttribute('dataset-old-id', content.id);
+        content.setAttribute('data-old-id', content.id);
       }
       content.id = 'lightbox-aria-desc';
       this.$container.append(content);

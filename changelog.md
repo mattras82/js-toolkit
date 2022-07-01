@@ -1,6 +1,12 @@
 # Public Functions's JavaScript Toolkit Changelog
 
-## Current Version: 1.1.0
+## Current Version: 1.1.1
+
+### 1.1.1
+
+Released on TODO : Update this 03 Mar 2022
+
+ - Major accessibility improvements to Lightbox module
 
 ### 1.1.0
 
