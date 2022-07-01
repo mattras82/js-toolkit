@@ -270,6 +270,7 @@ class Lightbox extends PFSingleton {
     this.contentPosition = null;
     this.tempClasses = this.tempClasses.filter(c => this.$container.classList.remove(c) && false);
     this.$container.removeAttribute('aria-label');
+    this.$container.removeAttribute('aria-labelledby');
   }
 
   open(content) {
@@ -307,8 +308,8 @@ class Lightbox extends PFSingleton {
         }
         $title.id = 'lightbox-aria-label';
         this.$container.setAttribute('aria-labelledby', 'lightbox-aria-label');
-      } else if (this.$tabableElements.filter($e => !$e.classList.contains('lightbox-close')).length) {
-        this.$container.ariaLabel = 'Your response is needed'
+      } else if (this.$tabableElements.filter($e => !$e.classList.contains('lightbox-close') && $e.innerText.toUpperCase() !== 'OK').length) {
+        this.$container.ariaLabel = 'Your response is needed';
       } else {
         this.$container.ariaLabel = 'Informative Message';
       }
