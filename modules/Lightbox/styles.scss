@@ -139,7 +139,9 @@ $lightbox-loading-thickness: 16px !default;
 			}
 
 			> .lightbox-close {
-				display: none;
+				width: 0;
+				height: 0;
+				overflow: hidden;
 			}
 
 			iframe,

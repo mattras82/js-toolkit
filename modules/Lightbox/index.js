@@ -19,6 +19,8 @@ class Lightbox extends PFSingleton {
     this.scrollPos = 0;
     this.iOSTest = null;
     this.closeOnEscape = true;
+    this.defaultContentID = 'lightbox-aria-desc';
+    this.defaultLabelID = 'lightbox-aria-label';
     return this.getInstance();
   }
 
@@ -59,7 +61,6 @@ class Lightbox extends PFSingleton {
     this.$container.classList.add('lightbox-container');
     this.$container.setAttribute('role', 'dialog');
     this.$container.ariaModal = 'true';
-    this.$container.setAttribute('aria-describedby', 'lightbox-aria-desc');
     this.$body.append(this.$container);
   }
 
@@ -213,22 +214,13 @@ class Lightbox extends PFSingleton {
   clearLightbox() {
     this.$body.classList.remove('lightbox-transition', 'lightbox-open');
     if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-closed', { bubbles: true }));
-    let $desc = this.$container.querySelector('#lightbox-aria-desc');
+    let $desc = this.$container.querySelector(`#${this.defaultContentID}`);
     if ($desc) {
       $desc.removeAttribute('id');
-      if ($desc.dataset.oldId) {
-        $desc.id = $desc.dataset.oldId;
-        $desc.removeAttribute('data-old-id');
-      }
     }
-    let $label = this.$container.querySelector('#lightbox-aria-label');
+    let $label = this.$container.querySelector(`#${this.defaultLabelID}`);
     if ($label) {
-      if ($label.dataset.oldId) {
-        $label.id = $label.dataset.oldId;
-        $label.removeAttribute('data-old-id');
-      } else {
-        $label.removeAttribute('id');
-      }
+      $label.removeAttribute('id');
     }
     this.clearContainer();
     if (this.customEvent) this.$eventElement.dispatchEvent(new CustomEvent('lightbox-cleared', { bubbles: true }));
@@ -268,9 +260,11 @@ class Lightbox extends PFSingleton {
 
     this.$contentParent = null;
     this.contentPosition = null;
+    this.ariaLabel = null;
     this.tempClasses = this.tempClasses.filter(c => this.$container.classList.remove(c) && false);
     this.$container.removeAttribute('aria-label');
     this.$container.removeAttribute('aria-labelledby');
+    this.$container.removeAttribute('aria-describedby');
   }
 
   open(content) {
@@ -290,11 +284,9 @@ class Lightbox extends PFSingleton {
       if (this.beforeContent.length) {
         this.beforeContent.forEach($el => this.$container.append($el));
       }
-      if (content.id && !content.dataset.oldId) {
-        content.setAttribute('data-old-id', content.id);
-      }
-      content.id = 'lightbox-aria-desc';
+      content.id = content.id || this.defaultContentID;
       this.$container.append(content);
+      this.$container.setAttribute('aria-describedby', content.id);
       if (this.afterContent.length) {
         this.afterContent.forEach($el => this.$container.append($el));
       }
@@ -303,11 +295,10 @@ class Lightbox extends PFSingleton {
       this.$lastTabStop = this.$tabableElements[this.$tabableElements.length - 1];
       let $title = this.$container.querySelector('.lightbox-title, h1, .h1, h2, .h2')
       if ($title) {
-        if ($title.id) {
-          $title.setAttribute('data-old-id', $title.id);
-        }
-        $title.id = 'lightbox-aria-label';
-        this.$container.setAttribute('aria-labelledby', 'lightbox-aria-label');
+        $title.id = $title.id || this.defaultLabelID;
+        this.$container.setAttribute('aria-labelledby', $title.id);
+      } else if (this.ariaLabel) {
+        this.$container.ariaLabel = this.ariaLabel;
       } else if (this.$tabableElements.filter($e => !$e.classList.contains('lightbox-close') && $e.innerText.toUpperCase() !== 'OK').length) {
         this.$container.ariaLabel = 'Your response is needed';
       } else {
@@ -481,7 +472,13 @@ class Lightbox extends PFSingleton {
 
     if ($a.title) {
       opts.title = $a.title;
-    };
+    } else if (src && $a.alt) {
+      this.ariaLabel = $a.alt;
+    }
+
+    if ($a.dataset.lbLabel) {
+      this.ariaLabel = $a.dataset.lbLabel;
+    }
 
     if ($a.dataset.lbIframe) {
       content = this.getIframeContent($a.dataset.lbIframe);
@@ -550,6 +547,7 @@ class Lightbox extends PFSingleton {
     }, { once: true });
     this.tempClasses.push('loading');
     this.tempClasses.push('lightbox-iframe');
+    if (!this.ariaLabel) this.ariaLabel = 'Embedded frame';
     return $frame;
   }
 
@@ -561,6 +559,7 @@ class Lightbox extends PFSingleton {
     }, { once: true });
     this.tempClasses.push('loading');
     this.tempClasses.push('lightbox-image');
+    if (!this.ariaLabel) this.ariaLabel = 'Image';
     return $image;
   }
 
@@ -590,6 +589,7 @@ class Lightbox extends PFSingleton {
     }, { once: true });
     this.tempClasses.push('loading');
     this.tempClasses.push('lightbox-video');
+    if (!this.ariaLabel) this.ariaLabel = 'Video';
     return $video;
   }
 

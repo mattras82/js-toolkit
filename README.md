@@ -165,28 +165,28 @@ If you want to open an image in a lightbox by clicking it, just add the "lightbo
 ```
 
 ### Secondary Image Lightbox
-If you want to open a secondary image in a lightbox by clicking a different image, add the URL to the secondary image to the `data-lb-src` attribute on the image element. 
+If you want to open a secondary image in a lightbox by clicking a different image, add the URL to the secondary image to the `data-lb-src` attribute on the image element. The `data-lb-label` attribute is used for proper web accessibility; the value of this attribute will be used to label the dialog for screen readers.
 
 This technique is helpful if you want to display a thumbnail image and then show the full size image when clicked.
 ```html
-<img src="/my-thumbnail.jpg" alt="My alt text" data-lb-src="/my-full-size-img.png">
+<img src="/my-thumbnail.jpg" alt="My alt text" data-lb-src="/my-full-size-img.png" data-lb-label="Full size image">
 ```
 
 ### Iframe Lightbox
 To show an iframe in a lightbox, simply add the URL for the iframe as the `data-lb-iframe` attribute of the clickable element.
 ```html
-<a href="#" data-lb-iframe="https://publicfunction.site">View Public Function Homepage</a>
+<a href="#" data-lb-iframe="https://publicfunction.site" data-lb-label="Public Function website homepage">View Public Function Homepage</a>
 ```
 
 ### Embed Lightbox
 If you want to show an embedded link (such as a YouTube embed) in a lightbox, just add the URL for the embed iframe as the `data-lb-iframe` attribute of the clickable element.
 ```html
-<a href="#" data-lb-iframe="https://www.youtube.com/embed/xyuMvwWZv2w">View Video</a>
+<a href="#" data-lb-iframe="https://www.youtube.com/embed/xyuMvwWZv2w" data-lb-label="YouTube video">View Video</a>
 ```
 
 As a best practice, you should add the embed URL as the `href` of the link for non-JavaScript compatibility.
 ```html
-<a href="https://www.youtube.com/embed/xyuMvwWZv2w" data-lb-iframe="https://www.youtube.com/embed/xyuMvwWZv2w" target="_blank" rel="noopener">View Video</a>
+<a href="https://www.youtube.com/embed/xyuMvwWZv2w" data-lb-iframe="https://www.youtube.com/embed/xyuMvwWZv2w" target="_blank" rel="noopener" data-lb-label="YouTube video">View Video</a>
 ```
 
 ### Lightbox Options
@@ -228,6 +228,9 @@ By default, any content on the same page is "cut" from its original place in the
 ```html
 <a href="#hidden" class="lightbox" data-lb-copy>Copy the HTML content</a>
 ```
+
+##### data-lb-label
+As noted above, the `data-lb-label` attribute is used to allow the lightbox content to be fully accessible to screen reader users. The lightbox will attempt to assume a generic label for the content, but it is a best practice to set a more descriptive label for any non-text content (ie videos or images);
 
 ## JavaScript Events
 All of the events are dispatched on the element that is sent to be opened in the lightbox, and they will bubble up the DOM as needed. Some events are cancelable, which will halt the current operation if canceld. 

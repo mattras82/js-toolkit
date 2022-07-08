@@ -1,10 +1,18 @@
 # Public Functions's JavaScript Toolkit Changelog
 
-## Current Version: 1.1.1
+## Current Version: 1.1.2
+
+### 1.1.2
+
+Released on 08 Jul 2022
+
+ - Fixing issues with ID attribute of Lightbox content element
+ - Adding `data-lb-label` attribute support for custom Lightbox aria label
+ - Adding generic fallback aria label text for image & iframe Lightbox content
 
 ### 1.1.1
 
-Released on TODO : Update this 03 Mar 2022
+Released on 01 Jul 2022
 
  - Major accessibility improvements to Lightbox module
 
