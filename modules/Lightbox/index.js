@@ -542,6 +542,7 @@ class Lightbox extends PFSingleton {
     let $frame = document.createElement('iframe');
     $frame.src = src;
     $frame.setAttribute('allowfullscreen', 'allowfullscreen');
+    $frame.setAttribute('allow', 'fullscreen; autoplay');
     $frame.addEventListener('load', () => {
       this.$container.classList.remove('loading');
     }, { once: true });

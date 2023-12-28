@@ -1,6 +1,12 @@
 # Public Functions's JavaScript Toolkit Changelog
 
-## Current Version: 1.1.2
+## Current Version: 1.1.3
+
+### 1.1.3
+
+Released on 28 Dec 2023
+
+ - Adding autoplay support with Lightbox iframes
 
 ### 1.1.2
 
